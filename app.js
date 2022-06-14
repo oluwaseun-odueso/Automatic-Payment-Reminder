@@ -1,9 +1,13 @@
 const express = require('express')
 const connection = require('./config/databaseConnection')
 const userRoute = require('./routes/userRoutes')
+require('dotenv').config()
 const port = 4000
 
 const app = express()
+app.use(express.json())
+
+connection
 
 app.use('/user', userRoute)
 

@@ -17,13 +17,21 @@ const User = connection.define('User', {
         allowNull: false
     },
     phone_number: {
-        type: DataTypes.NUMBER, 
+        type: DataTypes.STRING, 
         allowNull: false
     },
     password: {
         type: DataTypes.STRING, 
         allowNull: false
     }
+    // createdAt: {
+    //   type: DataTypes.DATE, 
+    //   allowNull: false
+    // }, 
+    // updatedAt: {
+    //   type: DataTypes.DATE, 
+    //   allowNull: false
+    // }
   }, {
     // Other model options go here
   });
