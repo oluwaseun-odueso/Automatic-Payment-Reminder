@@ -1,5 +1,6 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
+const res = require('express/lib/response')
 
 async function create (first_name, last_name, email, phone_number, password) {
     try {
@@ -13,10 +14,10 @@ async function create (first_name, last_name, email, phone_number, password) {
 
 async function checkEmail (email) {
     try {
-        const emailCheck = await User.findAll({
+        const emailCheck = await User.findOne({
             where: { email }
         })
-        return emailCheck.length
+        return emailCheck ? true : false
     } catch (error) {
         return error
     }
@@ -24,24 +25,30 @@ async function checkEmail (email) {
 
 async function checkPhoneNumber (phone_number) {
     try {
-        const numberCheck = await User.findAll({
+        const numberCheck = await User.findOne({
             where: { phone_number }
         })
-        return numberCheck.length
+        return numberCheck ? true : false
     } catch (error) {
         return error
     }
 }
 
+async function checkEmailAndPhoneNumber (email, phone_number) {
+    try {
+        const email_exists = await checkEmail(email)
+        const phone_number_exists = await checkPhoneNumber(phone_number)
+        if (email_exists && phone_number_exists) return true
+        else return false
+
+    } catch (error) {
+        return error
+    }
+}
 
 async function checkIfEnteredPasswordsMatches (password, confirm_password) {
     try {
-        if (password === confirm_password){
-            return true
-        } 
-        else {
-            return false
-        }
+        return password === confirm_password 
     } catch (error) {
         return error
     }
@@ -57,9 +64,9 @@ async function hashEnteredPassword(password) {
     }
 }
 
-async function selectAttributesByEmail (email) {
+async function getDetailsByEmail (email) {
     try {
-        const selected = await User.findAll({
+        const selected = await User.findOne({
             attributes: ['id', 'first_name', 'last_name', 'email', 'phone_number', 'createdAt', 'updatedAt'],
             where: {
                 email
@@ -70,6 +77,25 @@ async function selectAttributesByEmail (email) {
         return error
     }
 }
+
+
+// async function getDetailsByEmail2 (id) {
+//     try {
+//         const selected = await User.findAll({
+//             attributes: ['id', 'first_name', 'last_name', 'email', 'phone_number', 'createdAt', 'updatedAt'],
+//             where: { id }
+//         });
+
+//         if (selected == 1) return true
+//         else return false
+    
+//     } catch (error) {
+//         return error
+//     }
+// }
+
+// getDetailsById(18)
+    // .then(result => console.log(result[0]))
 
 async function collectEmailHashedPassword (email) {
     try {
@@ -92,8 +118,21 @@ async function checkIfEnteredPasswordEqualsHashed(password, hashedPassword) {
     }
 }
 
-// collectEmailHashedPassword('tinubabs@gmail.com')
-//     .then(result => console.log(result[0].password))
+async function updateAccountDetails (id, first_name, last_name, email, phone_number) {
+    try {
+        const updated = await User.update({first_name, last_name, email, phone_number}, {
+            where: {
+                id
+            }
+        })
+        return updated
+    } catch (error) {
+        return error 
+    }
+}
+
+// updateAccountDetails(18, 'Adedolapo', 'Emmauel', 'adedolly@gmail.com', '09066318532')
+//     .then(result => console.log(result))
 
 const functions = {
     create, 
@@ -101,9 +140,11 @@ const functions = {
     checkPhoneNumber, 
     checkIfEnteredPasswordsMatches, 
     hashEnteredPassword, 
-    selectAttributesByEmail,
+    getDetailsByEmail,
     collectEmailHashedPassword, 
-    checkIfEnteredPasswordEqualsHashed
+    checkIfEnteredPasswordEqualsHashed,
+    updateAccountDetails,
+    checkEmailAndPhoneNumber
 }
 
 module.exports  = functions
