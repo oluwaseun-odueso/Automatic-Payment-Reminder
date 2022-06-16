@@ -1,6 +1,5 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
-const res = require('express/lib/response')
 
 async function create (first_name, last_name, email, phone_number, password) {
     try {
@@ -67,35 +66,20 @@ async function hashEnteredPassword(password) {
 async function getDetailsByEmail (email) {
     try {
         const selected = await User.findOne({
-            attributes: ['id', 'first_name', 'last_name', 'email', 'phone_number', 'createdAt', 'updatedAt'],
+            attributes: { exclude: ['password'] },
             where: {
                 email
               }
         });
+        // console.log(selected)
         return selected
     } catch (error) {
         return error
     }
 }
 
-
-// async function getDetailsByEmail2 (id) {
-//     try {
-//         const selected = await User.findAll({
-//             attributes: ['id', 'first_name', 'last_name', 'email', 'phone_number', 'createdAt', 'updatedAt'],
-//             where: { id }
-//         });
-
-//         if (selected == 1) return true
-//         else return false
-    
-//     } catch (error) {
-//         return error
-//     }
-// }
-
-// getDetailsById(18)
-    // .then(result => console.log(result[0]))
+// getDetailsByEmail("topeolaiya@gmail.com")
+//     .then(result => console.log(result))
 
 async function collectEmailHashedPassword (email) {
     try {
@@ -131,7 +115,7 @@ async function updateAccountDetails (id, first_name, last_name, email, phone_num
     }
 }
 
-// updateAccountDetails(18, 'Adedolapo', 'Emmauel', 'adedolly@gmail.com', '09066318532')
+// updateAccountDetails(20, 'Oluwaseun', 'Janet', 'seunjane@gmail.com', '09073347721')
 //     .then(result => console.log(result))
 
 const functions = {
