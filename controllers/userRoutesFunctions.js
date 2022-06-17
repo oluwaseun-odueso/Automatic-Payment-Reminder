@@ -34,9 +34,9 @@ async function getAUser (id) {
 
 async function deleteAUser (id) {
     try {
-        const user = await User.destroy({
+        const response = await User.destroy({
             where: { id } })
-        return user
+        return response
     } catch (error) {
         return error
     }
@@ -146,12 +146,10 @@ async function checkIfEnteredPasswordEqualsHashed(password, hashedPassword) {
 
 async function updateAccountDetails (id, first_name, last_name, email, phone_number) {
     try {
-        const updated = await User.update({first_name, last_name, email, phone_number}, {
-            where: {
-                id
-            }
+        const response = await User.update({first_name, last_name, email, phone_number}, {
+            where: { id }
         })
-        return updated
+        return response
     } catch (error) {
         return error 
     }

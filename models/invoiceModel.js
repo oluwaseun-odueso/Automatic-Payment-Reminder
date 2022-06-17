@@ -2,14 +2,18 @@ const { Sequelize, DataTypes } = require('sequelize');
 const connection = require('../config/databaseConnection')
 
 
-const User = connection.define('User', {
-    first_name: {
-      type: DataTypes.STRING,
+const Invoice = connection.define('Invoice', {
+    invoice_number: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
-    last_name: {
-      type: DataTypes.STRING,
+    client_id: {
+      type: DataTypes.INTEGER,
       allowNull: false
+    },
+    client_name: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     email: {
         type: DataTypes.STRING,
@@ -19,7 +23,11 @@ const User = connection.define('User', {
         type: DataTypes.STRING, 
         allowNull: false
     },
-    password: {
+    description_of_work_done: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    Amount_to_be_paid: {
         type: DataTypes.STRING, 
         allowNull: false
     }
@@ -27,4 +35,4 @@ const User = connection.define('User', {
     // Other model options go here
   });
   
-module.exports = User
+module.exports = Invoice
