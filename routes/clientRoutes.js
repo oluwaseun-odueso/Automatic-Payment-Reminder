@@ -13,7 +13,7 @@ const {
 
 const router = express.Router()
 
-router.post('/create_client', async(req, res) => {
+router.post('/create_client', async (req, res) => {
     if (req.body.name && req.body.email && req.body.phone_number) {
         const {name, email, phone_number} = req.body
         try {

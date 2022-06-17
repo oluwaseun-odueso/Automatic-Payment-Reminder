@@ -2,6 +2,7 @@ const express = require('express')
 const connection = require('./config/databaseConnection')
 const userRoute = require('./routes/userRoutes')
 const clientRoute = require('./routes/clientRoutes')
+const invoiceRoute = require('./routes/invoiceRoutes')
 require('dotenv').config()
 const port = 4000
 
@@ -12,6 +13,7 @@ connection
 
 app.use('/user', userRoute)
 app.use('/client', clientRoute)
+app.use('/invoice', invoiceRoute)
 
 app.get('/', (req, res) => {
     res.status(200).send("Welcome to the official page")
