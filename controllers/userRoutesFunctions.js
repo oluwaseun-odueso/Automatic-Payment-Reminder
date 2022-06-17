@@ -11,6 +11,40 @@ async function create (first_name, last_name, email, phone_number, password) {
     }
 }
 
+async function getAllUsers () {
+    try {
+        const allUsers = await User.findAll()
+        return allUsers
+    } catch (error) {
+        return error
+    }
+}
+
+async function getAUser (id) {
+    try {
+        const user = await User.findOne({
+            attributes: { exclude: ['password'] },
+            where: { id }
+        })
+        return user
+    } catch (error) {
+        return error
+    }
+}
+
+async function deleteAUser (id) {
+    try {
+        const user = await User.destroy({
+            where: { id } })
+        return user
+    } catch (error) {
+        return error
+    }
+}
+
+// deleteAUser(8)
+//     .then(res => console.log(res))
+
 async function checkEmail (email) {
     try {
         const emailCheck = await User.findOne({
@@ -44,13 +78,12 @@ async function checkEmailAndPhoneNumber (email, phone_number) {
         return error
     }
 }
+function checkIfEntriesMatch (initialValue, newValue) {
+    return initialValue === newValue
+}
 
-async function checkIfEnteredPasswordsMatches (password, confirm_password) {
-    try {
-        return password === confirm_password 
-    } catch (error) {
-        return error
-    }
+function checkIfEnteredPasswordsMatches (password, confirm_password) {
+    return password === confirm_password 
 }
 
 async function hashEnteredPassword(password) {
@@ -67,11 +100,20 @@ async function getDetailsByEmail (email) {
     try {
         const selected = await User.findOne({
             attributes: { exclude: ['password'] },
-            where: {
-                email
-              }
+            where: { email }
         });
-        // console.log(selected)
+        return selected
+    } catch (error) {
+        return error
+    }
+}
+
+async function getDetailsById (id) {
+    try {
+        const selected = await User.findOne({
+            attributes: { exclude: ['password'] },
+            where: { id }
+        });
         return selected
     } catch (error) {
         return error
@@ -83,7 +125,7 @@ async function getDetailsByEmail (email) {
 
 async function collectEmailHashedPassword (email) {
     try {
-        const hashedPassword = await User.findAll({
+        const hashedPassword = await User.findOne({
             attributes: ['password'],
             where: { email }
         })
@@ -121,6 +163,9 @@ async function updateAccountDetails (id, first_name, last_name, email, phone_num
 const functions = {
     create, 
     checkEmail,
+    getAUser,
+    getAllUsers,
+    deleteAUser,
     checkPhoneNumber, 
     checkIfEnteredPasswordsMatches, 
     hashEnteredPassword, 
@@ -128,7 +173,9 @@ const functions = {
     collectEmailHashedPassword, 
     checkIfEnteredPasswordEqualsHashed,
     updateAccountDetails,
-    checkEmailAndPhoneNumber
+    checkEmailAndPhoneNumber, 
+    getDetailsById,
+    checkIfEntriesMatch
 }
 
 module.exports  = functions
