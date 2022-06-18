@@ -1,8 +1,12 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const connection = require('../config/databaseConnection')
 
 
 const Invoice = connection.define('Invoice', {
+    user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
     client_id: {
       type: DataTypes.INTEGER,
       allowNull: false
@@ -24,7 +28,7 @@ const Invoice = connection.define('Invoice', {
         allowNull: false
     },
     quantity: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     unit_price: {

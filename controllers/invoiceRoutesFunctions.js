@@ -1,9 +1,8 @@
-const { INTEGER } = require('sequelize')
 const Invoice = require('../models/invoiceModel')
 
-async function createInvoice (client_id, client_name, email, phone_number, item, quantity, unit_price, total) {
+async function createInvoice (user_id, client_id, client_name, email, phone_number, item, quantity, unit_price, total) {
     try {
-        const details = {client_id, client_name, email, phone_number, item, quantity, unit_price, total}
+        const details = {user_id, client_id, client_name, email, phone_number, item, quantity, unit_price, total}
         const user = await Invoice.create(details)
         return user
     } catch (error) {
@@ -11,23 +10,21 @@ async function createInvoice (client_id, client_name, email, phone_number, item,
     }
 }
 
-// To be tested
-async function getAllInvoices () {
+async function getAllInvoices (user_id) {
     try {
-        const allInvoices = await Invoice.findAll()
+        const allInvoices = await Invoice.findAll({
+            where: {user_id}
+        })
         return allInvoices
     } catch (error) {
         return error
     }
 }
-// getAllInvoices()
-//     .then(i => console.log(i.length))
 
-// To be tested
-async function getInvoiceById (id) {
+async function getInvoiceById (id, user_id) {
     try {
         const selected = await Invoice.findOne({  
-            where: { id }
+            where: { id , user_id}
         });
         return selected
     } catch (error) {
@@ -35,11 +32,10 @@ async function getInvoiceById (id) {
     }
 }
 
-
-async function deleteAnInvoice (id) {
+async function deleteAnInvoice (id, user_id) {
     try {
         const response = await Invoice.destroy({
-            where: { id } 
+            where: { id, user_id } 
         })
         return response
     } catch (error) {
@@ -47,14 +43,24 @@ async function deleteAnInvoice (id) {
     }
 }
 
-// createInvoice(7, "Mosunola Ademola", "mosunmi@gmail.com", "08041773890", "Cartier ladies brown bag", "2", "50,000", "100,000")
-//     .then(res => console.log(res))
+async function updateInvoiceDetails (user_id, id, client_id, client_name, email, phone_number, item, quantity, unit_price, total) {
+    try {
+        const details = {client_id, client_name, email, phone_number, item, quantity, unit_price, total}
+        const user = await Invoice.update(details, {
+            where: { id , user_id}
+        })
+        return user
+    } catch (error) {
+        return error
+    }
+}
 
 const functions = {
     createInvoice,
     getAllInvoices,
     getInvoiceById,
-    deleteAnInvoice
+    deleteAnInvoice,
+    updateInvoiceDetails
 }
 
 module.exports = functions

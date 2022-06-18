@@ -13,7 +13,7 @@ const Client = connection.define('Client', {
     phone_number: {
         type: DataTypes.STRING, 
         allowNull: false
-    },
+    }
 }, {
     // Other model options go here
 })

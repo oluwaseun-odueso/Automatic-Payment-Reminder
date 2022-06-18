@@ -56,7 +56,7 @@ router.patch('/update_client_details/:id', async (req, res) => {
             }
             await updateClientDetails(req.params.id, name, email, phone_number)
             const updated = await getClientById(req.params.id)
-            res.status(200).send(updated)
+            res.status(201).send(updated)
             
          } catch (error) { res.send({message : error.message}) }
     }

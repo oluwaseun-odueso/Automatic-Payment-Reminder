@@ -3,16 +3,18 @@ const {
     createInvoice, 
     getAllInvoices,
     getInvoiceById,
-    deleteAnInvoice
+    deleteAnInvoice,
+    updateInvoiceDetails
 } = require('../controllers/invoiceRoutesFunctions')
+const {verifyToken} = require('../config/auth')
 
 const router = express.Router()
 
-router.post('/create_invoice', async (req, res) => {
+router.post('/create_invoice', verifyToken, async (req, res) => {
     if (req.body.client_id && req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total) {
         const {client_id, client_name, email, phone_number, item, quantity, unit_price, total} = req.body
         try {
-            const invoice = createInvoice(client_id, client_name, email, phone_number, item, quantity, unit_price, total)
+            const invoice = await createInvoice(req.user.id, client_id, client_name, email, phone_number, item, quantity, unit_price, total)
             res.status(201).send({
                 message : "New invoice created", 
                 invoice
@@ -21,16 +23,16 @@ router.post('/create_invoice', async (req, res) => {
     } else res.status(400).send({ errno: "101", message: "Please enter all required fields correctly." })
 })
 
-router.get('/get_all_invoices', async (req, res) => {
+router.get('/get_all_invoices', verifyToken, async (req, res) => {
     try {
-        const clients = await getAllInvoices()
+        const clients = await getAllInvoices(req.user.id)
         res.status(200).send(clients)
     } catch (error) { res.send({message : error.message}) }
 })
 
-router.get('/get_invoice/:id', async (req, res) => {
+router.get('/get_invoice/:id', verifyToken, async (req, res) => {
     try {
-        const invoice = await getInvoiceById(req.params.id)
+        const invoice = await getInvoiceById(req.params.id, req.user.id)
         if ( ! invoice) {
             res.status(400).send({ message: "Invoice does not exist" })
             return
@@ -39,24 +41,30 @@ router.get('/get_invoice/:id', async (req, res) => {
     } catch (error) { res.send({message : error.message}) }
 })
 
-router.patch('/update_invoice_details/:id', async (req, res) => {
-    if (req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total) {
-        const {client_name, email, phone_number, item, quantity, unit_price, total} = req.body
-        const client = await getInvoiceById(req.params.id)
+router.patch('/update_invoice_details/:id', verifyToken, async (req, res) => {
+    if (req.body.client_id, req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total) {
+        const {client_id, client_name, email, phone_number, item, quantity, unit_price, total} = req.body
         try {
-            await updateInvoiceDetails(req.params.id, client_name, email, phone_number, item, quantity, unit_price, total)
-            const updated = await getClientById(req.params.id)
-            res.status(200).send(updated)
-            
+            const checkIfInvoiceExists = await getInvoiceById(req.params.id, req.user.id)
+            if ( ! checkIfInvoiceExists) {
+                res.status(400).send({ message: "Invoice does not exist" })
+                return
+            }
+            await updateInvoiceDetails(req.user.id, req.params.id, client_id, client_name, email, phone_number, item, quantity, unit_price, total)
+            const invoice = await getInvoiceById(req.params.id, req.user.id)
+            res.status(201).send({
+                message: "Invoice updated",
+                invoice
+            })
          } catch (error) { res.send({message : error.message}) }
     }
     else res.status(400).send({ errno: "101", message: "Please enter all fields" })
 })
 
-router.delete('/delete_invoice/:id', async (req, res) => {
+router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
     try {
-        const result = await deleteAnInvoice(req.params.id)
-        if (result === 1) {
+        const result = await deleteAnInvoice(req.params.id, req.user.id)
+        if ( result) {
             res.status(200).send({message: "Invoice has been deleted."})
             return
         }
