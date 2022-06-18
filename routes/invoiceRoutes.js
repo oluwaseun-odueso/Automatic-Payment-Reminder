@@ -1,4 +1,7 @@
 const express = require('express')
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+
 const {
     createInvoice, 
     getAllInvoices,
@@ -70,6 +73,52 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
         }
         res.status(400).send({message: "Invoice does not exist"})
     } catch (error) { res.send({message : error.message}) }
+})
+
+router.post('/send_email/:id', verifyToken, async (req, res) => {
+    // if (req.body) {
+        console.log(req.params.id)
+    try {
+        const invoice = await getInvoiceById(req.params.id, req.user.id)
+        if ( ! invoice) {
+            res.status(400).send({ message: "Invoice does not exist" })
+            return
+        }
+
+        const transporter = nodemailer.createTransport({
+            service : "gmail",
+            auth: {
+                user: "seunoduez@gmail.com",
+                pass: process.env.EMAIL_PASSWORD
+            }  
+        });
+    
+        const options = {
+            from: "seunoduez@gmail.com",
+            to: "backendseun@gmail.com",
+            subject: "Alert for overdue payment.",
+            text: "Dear esteemed client, this is a reminder the payment for your previous purchase from us is now overdue, find the link to pay below ." + invoice 
+        };
+    
+        console.log(options)
+
+        transporter.sendMail(options, function(err, info) {
+            if(err) {
+                console.log(err);
+                return;
+            }
+            console.log("Email sent: " + info.response);
+        })
+
+        res.status(200).send({ message: "Mail has been sent to client." })
+    } catch (error) { res.send({message : error.message}) }
+    // }
+    // else {
+    //     res.status(500).send({
+    //         errno:"110" ,
+    //         message : "Please provide parameters"
+    //     })
+    // }
 })
 
 module.exports = router
