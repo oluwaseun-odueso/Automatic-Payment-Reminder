@@ -1,5 +1,6 @@
 const express = require('express')
 const nodemailer = require('nodemailer');
+const invoice_reminder = require('../job/reminder')
 require('dotenv').config();
 
 const {
@@ -9,7 +10,7 @@ const {
     deleteAnInvoice,
     updateInvoiceDetails
 } = require('../controllers/invoiceRoutesFunctions')
-const {verifyToken} = require('../config/auth')
+const { verifyToken } = require('../config/auth')
 
 const router = express.Router()
 
@@ -75,9 +76,7 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
     } catch (error) { res.send({message : error.message}) }
 })
 
-router.post('/send_email/:id', verifyToken, async (req, res) => {
-    // if (req.body) {
-        console.log(req.params.id)
+router.post('/send_invoice/:id', verifyToken, async (req, res) => {
     try {
         const invoice = await getInvoiceById(req.params.id, req.user.id)
         if ( ! invoice) {
@@ -95,13 +94,22 @@ router.post('/send_email/:id', verifyToken, async (req, res) => {
     
         const options = {
             from: "seunoduez@gmail.com",
-            to: "backendseun@gmail.com",
+            to: invoice.email,
             subject: "Alert for overdue payment.",
-            text: "Dear esteemed client, this is a reminder the payment for your previous purchase from us is now overdue, find the link to pay below ." + invoice 
-        };
+            text: `Dear esteemed client, this is a 
+            reminder the payment for your 
+            previous purchase for
+            item: ${invoice.item},
+            invoice id: ${invoice.id}
+            quantity: ${invoice.quantity},
+            unit price: ${invoice.unit_price}
+            total price: ${invoice.total},
+            from us is now overdue, 
+            find the link to pay below .
+            
+            link: ${req.user.payment_link}`  
+        }; 
     
-        console.log(options)
-
         transporter.sendMail(options, function(err, info) {
             if(err) {
                 console.log(err);
@@ -110,15 +118,9 @@ router.post('/send_email/:id', verifyToken, async (req, res) => {
             console.log("Email sent: " + info.response);
         })
 
+        invoice_reminder.start()
         res.status(200).send({ message: "Mail has been sent to client." })
     } catch (error) { res.send({message : error.message}) }
-    // }
-    // else {
-    //     res.status(500).send({
-    //         errno:"110" ,
-    //         message : "Please provide parameters"
-    //     })
-    // }
 })
 
 module.exports = router

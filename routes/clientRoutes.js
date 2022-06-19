@@ -10,10 +10,11 @@ const {
     deleteAClient,
     updateClientDetails
 } = require('../controllers/clientRoutesFunctions')
+const { verifyToken } = require('../config/auth')
 
 const router = express.Router()
 
-router.post('/create_client', async (req, res) => {
+router.post('/create_client', verifyToken, async (req, res) => {
     if (req.body.name && req.body.email && req.body.phone_number) {
         const {name, email, phone_number} = req.body
         try {
@@ -29,7 +30,7 @@ router.post('/create_client', async (req, res) => {
                 res.status(400).send({ message : "Phone number already exists"})
                 return
             }
-            const client = await createClient(name, email, phone_number)
+            const client = await createClient(req.user.id, name, email, phone_number)
             res.status(201).send({
                 message : "New client added", 
                 client
@@ -38,11 +39,16 @@ router.post('/create_client', async (req, res) => {
     } else res.status(400).send({ errno: "101", message: "Please enter all required fields correctly." })
 })
 
-router.patch('/update_client_details/:id', async (req, res) => {
+router.patch('/update_client_details/:id', verifyToken, async (req, res) => {
     if (req.body.name && req.body.email && req.body.phone_number) {
         const {name, email, phone_number} = req.body
-        const client = await getClientById(req.params.id)
+        const client = await getClientById(req.params.id, req.user.id)
         try {
+            if ( ! client ) {
+                res.status(400).send({ message: "Client does not exist" })
+                return
+            }
+
             // If email exists in database and email is not clients's existing email
             if ( await checkIfEmailExists(email) && ! checkIfEntriesMatch(client.email, email) ) {
                 res.status(400).send({ message: "Email already exists" })
@@ -54,8 +60,8 @@ router.patch('/update_client_details/:id', async (req, res) => {
                 res.status(400).send({ message: "Phone number already exists" })
                 return
             }
-            await updateClientDetails(req.params.id, name, email, phone_number)
-            const updated = await getClientById(req.params.id)
+            await updateClientDetails(req.user.id, req.params.id, name, email, phone_number)
+            const updated = await getClientById(req.params.id, req.user.id)
             res.status(201).send(updated)
             
          } catch (error) { res.send({message : error.message}) }
@@ -63,9 +69,9 @@ router.patch('/update_client_details/:id', async (req, res) => {
     else res.status(400).send({ errno: "101", message: "Please enter all fields" })
 })
 
-router.get('/get_client/:id', async (req, res) => {
+router.get('/get_client/:id', verifyToken, async (req, res) => {
     try {
-        const client = await getClientById(req.params.id)
+        const client = await getClientById(req.params.id, req.user.id)
         if ( ! client) {
             res.status(400).send({ message: "Client does not exist" })
             return
@@ -74,17 +80,17 @@ router.get('/get_client/:id', async (req, res) => {
     } catch (error) { res.send({message : error.message}) }
 })
 
-router.get('/get_all_clients', async (req, res) => {
+router.get('/get_all_clients', verifyToken, async (req, res) => {
     try {
-        const clients = await getAllClients()
+        const clients = await getAllClients(req.user.id)
         res.status(200).send(clients)
     } catch (error) { res.send({message : error.message}) }
 })
 
-router.delete('/delete_client/:id', async (req, res) => {
+router.delete('/delete_client/:id', verifyToken, async (req, res) => {
     try {
-        const result = await deleteAClient(req.params.id)
-        if (result === 1) {
+        const result = await deleteAClient(req.params.id, req.user.id)
+        if (result ) {
             res.status(200).send({message: "Client has been deleted."})
             return
         }

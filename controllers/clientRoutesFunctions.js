@@ -1,8 +1,8 @@
 const Client = require('../models/clientModel')
 
-async function createClient (name, email, phone_number) {
+async function createClient (user_id, name, email, phone_number) {
     try {
-        const details = {name, email, phone_number}
+        const details = {user_id, name, email, phone_number}
         const user = await Client.create(details)
         return user
     } catch (error) {
@@ -45,10 +45,10 @@ async function checkIfEmailAndPhoneNumberExists (email, phone_number) {
 }
 
 
-async function getClientById (id) {
+async function getClientById (id, user_id) {
     try {
         const selected = await Client.findOne({  
-            where: { id }
+            where: { id , user_id}
         });
         return selected
     } catch (error) {
@@ -56,19 +56,21 @@ async function getClientById (id) {
     }
 }
 
-async function getAllClients () {
+async function getAllClients (user_id) {
     try {
-        const allClients = await Client.findAll()
+        const allClients = await Client.findAll({
+            where: {user_id}
+        })
         return allClients
     } catch (error) {
         return error
     }
 }
 
-async function deleteAClient (id) {
+async function deleteAClient (id, user_id) {
     try {
         const response = await Client.destroy({
-            where: { id } 
+            where: { id, user_id } 
         })
         return response
     } catch (error) {
@@ -80,10 +82,10 @@ function checkIfEntriesMatch (initialValue, newValue) {
     return initialValue === newValue
 }
 
-async function updateClientDetails (id, name, email, phone_number) {
+async function updateClientDetails (user_id, id, name, email, phone_number) {
     try {
         const response = await Client.update({name, email, phone_number}, {
-            where: { id }
+            where: { id, user_id }
         })
         return response
     } catch (error) {

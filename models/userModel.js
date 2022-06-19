@@ -11,6 +11,14 @@ const User = connection.define('User', {
       type: DataTypes.STRING,
       allowNull: false
     },
+    business_name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    payment_link: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: false

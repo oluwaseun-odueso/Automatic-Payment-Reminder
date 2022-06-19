@@ -1,7 +1,7 @@
 const express = require('express')
 const {generateToken, verifyToken} = require('../config/auth')
 const {
-    create, 
+    createUser, 
     checkEmail,
     getAUser,
     getAllUsers, 
@@ -50,8 +50,8 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/signUp', async(req, res) => {
-    if (req.body.first_name && req.body.last_name && req.body.email && req.body.phone_number && req.body.password && req.body.confirm_password) {
-        const {first_name, last_name, email, phone_number, password, confirm_password} = req.body
+    if (req.body.first_name && req.body.last_name && req.body.business_name && req.body.payment_link && req.body.email && req.body.phone_number && req.body.password && req.body.confirm_password) {
+        const {first_name, last_name, business_name, payment_link, email, phone_number, password, confirm_password} = req.body
         try {
             if ( await checkEmailAndPhoneNumber (email, phone_number) ) {
                 res.status(400).send({ message : "Email and phone number already exists"}) 
@@ -71,7 +71,7 @@ router.post('/signUp', async(req, res) => {
             }
 
             const hashedPassword = await hashEnteredPassword(password)
-            await create(first_name, last_name, email, phone_number, hashedPassword)
+            await createUser(first_name, last_name, business_name, payment_link, email, phone_number, hashedPassword)
             const user = await getDetailsByEmail(email)
             res.status(201).send({
                 message : "New user added", 
@@ -84,8 +84,8 @@ router.post('/signUp', async(req, res) => {
 
 
 router.patch('/update_account_details', verifyToken, async(req, res) => {
-    if (req.body.first_name && req.body.last_name && req.body.email && req.body.phone_number) {
-        const { first_name, last_name, email, phone_number} = req.body
+    if (req.body.first_name && req.body.last_name && req.body.business_name && req.body.payment_link && req.body.email && req.body.phone_number) {
+        const { first_name, last_name, business_name, payment_link, email, phone_number} = req.body
         const user = await getDetailsById(req.user.id)
         try {
             // If email exists in database and email is not user's existing email
@@ -99,7 +99,7 @@ router.patch('/update_account_details', verifyToken, async(req, res) => {
                 res.status(400).send("Phone number already exists")
                 return
             }
-            await updateAccountDetails(req.user.id, first_name, last_name, email, phone_number)
+            await updateAccountDetails(req.user.id, first_name, last_name, business_name, payment_link, email, phone_number)
             const updated = await getDetailsById(req.user.id)
             res.status(200).send(updated)
         } catch (error) { res.send({message : error.message}) }

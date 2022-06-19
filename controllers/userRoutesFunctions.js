@@ -1,9 +1,9 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 
-async function create (first_name, last_name, email, phone_number, password) {
+async function createUser (first_name, last_name, business_name, payment_link, email, phone_number, password) {
     try {
-        const details = {first_name, last_name, email, phone_number, password}
+        const details = {first_name, last_name, business_name, payment_link, email, phone_number, password}
         const user = await User.create(details)
         return user
     } catch (error) {
@@ -144,9 +144,9 @@ async function checkIfEnteredPasswordEqualsHashed(password, hashedPassword) {
     }
 }
 
-async function updateAccountDetails (id, first_name, last_name, email, phone_number) {
+async function updateAccountDetails (id, first_name, last_name, business_name, payment_link, email, phone_number) {
     try {
-        const response = await User.update({first_name, last_name, email, phone_number}, {
+        const response = await User.update({first_name, last_name, business_name, payment_link, email, phone_number}, {
             where: { id }
         })
         return response
@@ -159,7 +159,7 @@ async function updateAccountDetails (id, first_name, last_name, email, phone_num
 //     .then(result => console.log(result))
 
 const functions = {
-    create, 
+    createUser, 
     checkEmail,
     getAUser,
     getAllUsers,

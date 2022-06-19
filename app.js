@@ -3,6 +3,7 @@ const connection = require('./config/databaseConnection')
 const userRoute = require('./routes/userRoutes')
 const clientRoute = require('./routes/clientRoutes')
 const invoiceRoute = require('./routes/invoiceRoutes')
+const invoice_reminder = require('./job/reminder')
 require('dotenv').config()
 const port = 4000
 
