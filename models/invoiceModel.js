@@ -38,7 +38,11 @@ const Invoice = connection.define('Invoice', {
     total: {
         type: DataTypes.STRING, 
         allowNull: false
-    }
+    },
+    payment_status: {
+      type: DataTypes.STRING, 
+      allowNull: false
+  }
   }, {
     // Other model options go here
   });

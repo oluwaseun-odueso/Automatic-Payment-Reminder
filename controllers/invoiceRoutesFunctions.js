@@ -1,8 +1,8 @@
 const Invoice = require('../models/invoiceModel')
 
-async function createInvoice (user_id, client_id, client_name, email, phone_number, item, quantity, unit_price, total) {
+async function createInvoice (user_id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status) {
     try {
-        const details = {user_id, client_id, client_name, email, phone_number, item, quantity, unit_price, total}
+        const details = {user_id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status}
         const user = await Invoice.create(details)
         return user
     } catch (error) {
@@ -43,9 +43,9 @@ async function deleteAnInvoice (id, user_id) {
     }
 }
 
-async function updateInvoiceDetails (user_id, id, client_id, client_name, email, phone_number, item, quantity, unit_price, total) {
+async function updateInvoiceDetails (user_id, id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status) {
     try {
-        const details = {client_id, client_name, email, phone_number, item, quantity, unit_price, total}
+        const details = {client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status}
         const user = await Invoice.update(details, {
             where: { id , user_id}
         })

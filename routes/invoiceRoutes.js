@@ -1,8 +1,8 @@
 const express = require('express')
-const nodemailer = require('nodemailer');
-const invoice_reminder = require('../job/reminder')
 require('dotenv').config();
-
+const { verifyToken } = require('../config/auth')
+const SendEmail = require('../config/emailConfig')
+const invoice_reminder = require('../job/reminder')
 const {
     createInvoice, 
     getAllInvoices,
@@ -10,15 +10,16 @@ const {
     deleteAnInvoice,
     updateInvoiceDetails
 } = require('../controllers/invoiceRoutesFunctions')
-const { verifyToken } = require('../config/auth')
+const {getClientById} = require('../controllers/clientRoutesFunctions');
 
 const router = express.Router()
 
 router.post('/create_invoice', verifyToken, async (req, res) => {
-    if (req.body.client_id && req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total) {
-        const {client_id, client_name, email, phone_number, item, quantity, unit_price, total} = req.body
+    if (req.body.client_id && req.body.item && req.body.quantity && req.body.unit_price && req.body.total && req.body.payment_status) {
+        const {client_id, item, quantity, unit_price, total, payment_status} = req.body
         try {
-            const invoice = await createInvoice(req.user.id, client_id, client_name, email, phone_number, item, quantity, unit_price, total)
+            const client = await getClientById(client_id, req.user.id)
+            const invoice = await createInvoice(req.user.id, client_id, client.name, client.email, client.phone_number, item, quantity, unit_price, total, payment_status)
             res.status(201).send({
                 message : "New invoice created", 
                 invoice
@@ -46,15 +47,15 @@ router.get('/get_invoice/:id', verifyToken, async (req, res) => {
 })
 
 router.patch('/update_invoice_details/:id', verifyToken, async (req, res) => {
-    if (req.body.client_id, req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total) {
-        const {client_id, client_name, email, phone_number, item, quantity, unit_price, total} = req.body
+    if (req.body.client_id, req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total && req.body.payment_status) {
+        const {client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status} = req.body
         try {
             const checkIfInvoiceExists = await getInvoiceById(req.params.id, req.user.id)
             if ( ! checkIfInvoiceExists) {
                 res.status(400).send({ message: "Invoice does not exist" })
                 return
             }
-            await updateInvoiceDetails(req.user.id, req.params.id, client_id, client_name, email, phone_number, item, quantity, unit_price, total)
+            await updateInvoiceDetails(req.user.id, req.params.id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status)
             const invoice = await getInvoiceById(req.params.id, req.user.id)
             res.status(201).send({
                 message: "Invoice updated",
@@ -83,43 +84,15 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
             res.status(400).send({ message: "Invoice does not exist" })
             return
         }
+        console.log(invoice.payment_status)
+        await SendEmail.sendInvoice(invoice, req.user.payment_link)
 
-        const transporter = nodemailer.createTransport({
-            service : "gmail",
-            auth: {
-                user: "seunoduez@gmail.com",
-                pass: process.env.EMAIL_PASSWORD
-            }  
-        });
+        if (invoice.payment_status === 'unpaid') {
+            invoice_reminder(invoice, req.user.payment_link, invoice.payment_status)
+        }
     
-        const options = {
-            from: "seunoduez@gmail.com",
-            to: invoice.email,
-            subject: "Alert for overdue payment.",
-            text: `Dear esteemed client, this is a 
-            reminder the payment for your 
-            previous purchase for
-            item: ${invoice.item},
-            invoice id: ${invoice.id}
-            quantity: ${invoice.quantity},
-            unit price: ${invoice.unit_price}
-            total price: ${invoice.total},
-            from us is now overdue, 
-            find the link to pay below .
-            
-            link: ${req.user.payment_link}`  
-        }; 
-    
-        transporter.sendMail(options, function(err, info) {
-            if(err) {
-                console.log(err);
-                return;
-            }
-            console.log("Email sent: " + info.response);
-        })
-
-        invoice_reminder.start()
         res.status(200).send({ message: "Mail has been sent to client." })
+
     } catch (error) { res.send({message : error.message}) }
 })
 
