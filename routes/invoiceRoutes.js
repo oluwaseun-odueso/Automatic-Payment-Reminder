@@ -88,7 +88,7 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         await SendEmail.sendInvoice(invoice, req.user.payment_link)
 
         // Start invoice reminder cron job
-        startEndReminderCronJob(invoice, req.user.payment_link)
+        await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
 
 
         // if (invoice.payment_status === 'unpaid') {
