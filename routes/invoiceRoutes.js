@@ -2,7 +2,7 @@ const express = require('express')
 require('dotenv').config();
 const { verifyToken } = require('../config/auth')
 const SendEmail = require('../config/emailConfig')
-const invoice_reminder = require('../job/reminder')
+const startEndReminderCronJob = require('../job/reminder')
 const {
     createInvoice, 
     getAllInvoices,
@@ -87,9 +87,13 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         console.log(invoice.payment_status)
         await SendEmail.sendInvoice(invoice, req.user.payment_link)
 
-        if (invoice.payment_status === 'unpaid') {
-            invoice_reminder(invoice, req.user.payment_link, invoice.payment_status)
-        }
+        // Start invoice reminder cron job
+        startEndReminderCronJob(invoice, req.user.payment_link)
+
+
+        // if (invoice.payment_status === 'unpaid') {
+        // await invoice_reminder(req.user.payment_link, req.params.id, req.user.id)
+        // }
     
         res.status(200).send({ message: "Mail has been sent to client." })
 

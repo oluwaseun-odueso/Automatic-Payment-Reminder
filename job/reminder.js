@@ -1,21 +1,22 @@
 const cron = require('node-cron');
 const SendEmail = require('../config/emailConfig')
+const {getInvoiceById} = require('../controllers/invoiceRoutesFunctions')
 
-// const invoice_reminder = cron.schedule('* * * * *', async () => {
-//   SendEmail.sendReminder(invoice, payment_link)
-//   console.log('running a task every minute');
-//   }, {
-//     scheduled: false
-//   });
 
-function invoice_reminder (invoice, payment_link, payment_status) {
-  if (payment_status === 'unpaid') {
-    cron.schedule('*/20 * * * * *', async () => {
-      await SendEmail.sendReminder(invoice, payment_link)
-      console.log('Running a task every 20 seconds')
-    });
-  }
-  
+function startEndReminderCronJob (invoice, payment_link) {
+  // Check if invoice has been paid
+  const reminder_invoice_job = cron.schedule('*/20 * * * * *', async () => {
+    await SendEmail.sendReminder(invoice, payment_link)
+    console.log('Running a task every 20 seconds')  
+  }, {
+    scheduled: false
+  });
+  reminder_invoice_job.start()
+  endReminderCronJob(reminder_invoice_job)
 }
 
-module.exports = invoice_reminder
+function endReminderCronJob (job) {
+  job.stop()
+}
+
+module.exports = startEndReminderCronJob
