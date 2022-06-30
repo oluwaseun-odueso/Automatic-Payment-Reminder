@@ -10,7 +10,7 @@ async function startEndReminderCronJob (invoice, payment_link, user_id) {
     }
     else {
       await SendEmail.sendReminder(invoice, payment_link)
-      console.log('Running a task every 20 seconds')
+      console.log(`Email sent to ${invoice.email}`)
     }  
   });
 }
