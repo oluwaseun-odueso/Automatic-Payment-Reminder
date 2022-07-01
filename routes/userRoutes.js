@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
             const token = await generateToken(user)
 
             res.status(200).send({
-                message : "You have successfully logged in.", 
+                message : "You have successfully logged in", 
                 user, 
                 token
             })
