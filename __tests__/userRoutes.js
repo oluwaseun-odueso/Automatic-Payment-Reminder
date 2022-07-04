@@ -1,6 +1,20 @@
 const request = require('supertest')
 const app = require('../app')
-const {generateToken, verifyToken} = require('../config/auth')
+
+let token ;
+
+beforeAll(done => {
+  request(app)
+  .post('/user/login')
+  .send({
+    email: 'danielsumah@gmail.com',
+    password: "Daniel"
+  })
+  .end((err, response) => {
+    token = response.body.token;
+    done()
+  })
+});
 
 describe('Login route test', () => {
     test('With valid login details', async () => {
@@ -142,8 +156,24 @@ describe('Sign up route test', () => {
     })
 })
 
-// describe('Update account details route', () => {
-//     test('201 status code for a successful request', async () => {
-//         const response = await request(app).
-//     })
-// })
+describe('Update account details route', () => {
+    test('201 status code for a successful request, valid update request', async () => {
+        
+        const response = await request(app)
+        .patch('/user/update_account_details')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+            first_name: "Dan",
+            last_name: "Isunoya",
+            business_name: "Daniiieee Shoes",
+            payment_link: "https://paystack.com/pay/timpel",
+            email: "danielsumah@gmail.com",
+            phone_number: "09029326141"
+        })
+
+        console.log(response.body)
+        expect(response.body.message).toBe("Account details updated")
+        expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+        expect(response.statusCode).toBe(200);
+    })
+})

@@ -101,7 +101,7 @@ router.patch('/update_account_details', verifyToken, async(req, res) => {
             }
             await updateAccountDetails(req.user.id, first_name, last_name, business_name, payment_link, email, phone_number)
             const updated = await getDetailsById(req.user.id)
-            res.status(200).send(updated)
+            res.status(200).send({message: 'Account details updated', updated})
         } catch (error) { res.send({message : error.message}) }
     }
     else res.status(400).send({ errno: "101", message: "Please enter all fields" })
