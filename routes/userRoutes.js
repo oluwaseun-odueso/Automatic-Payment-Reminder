@@ -90,13 +90,13 @@ router.patch('/update_account_details', verifyToken, async(req, res) => {
         try {
             // If email exists in database and email is not user's existing email
             if ( await checkEmail (email) && ! checkIfEntriesMatch(user.email, email)) {
-                res.status(400).send("Email already exists")
+                res.status(400).send({message: "Email already exists"})
                 return
             }
 
             // If phone_number exists in database and phone_number is not user's existing phone_number
             if ( await checkPhoneNumber (phone_number) && ! checkIfEntriesMatch(user.phone_number, phone_number)) {
-                res.status(400).send("Phone number already exists")
+                res.status(400).send({message: "Phone number already exists"})
                 return
             }
             await updateAccountDetails(req.user.id, first_name, last_name, business_name, payment_link, email, phone_number)
@@ -107,11 +107,11 @@ router.patch('/update_account_details', verifyToken, async(req, res) => {
     else res.status(400).send({ errno: "101", message: "Please enter all fields" })
 })
 
-router.delete('/delete_account/:id', async (req, res) => {
+router.delete('/delete_account', verifyToken, async (req, res) => {
     try {
-        const result = await deleteAUser(req.params.id)
+        const result = await deleteAUser(req.user.id)
         if (result === 1) {
-            res.status(200).send({message: "User has been deleted."})
+            res.status(200).send({message: "Your account has been deleted."})
             return
         }
         res.status(400).send({message: "User does not exist"})

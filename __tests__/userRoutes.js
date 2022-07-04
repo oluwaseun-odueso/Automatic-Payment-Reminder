@@ -3,24 +3,33 @@ const app = require('../app')
 
 let token ;
 
-beforeAll(done => {
-  request(app)
-  .post('/user/login')
-  .send({
-    email: 'danielsumah@gmail.com',
-    password: "Daniel"
-  })
-  .end((err, response) => {
+// beforeAll(done => {
+//   request(app)
+//   .post('/user/login')
+//   .send({
+//     email: 'danielsumah@gmail.com',
+//     password: "Daniel"
+//   })
+//   .end((err, response) => {
+//     token = response.body.token;
+//     done()
+//   })
+// });
+
+beforeAll(async () => {
+    const response = await request(app).post('/user/login')
+    .send({
+        email: 'bola1@gmail.com',
+        password: "bola1"
+      })
     token = response.body.token;
-    done()
-  })
-});
+  });
 
 describe('Login route test', () => {
     test('With valid login details', async () => {
         const response = await request(app).post('/user/login').send({
-            email: 'danielsumah@gmail.com',
-            password: "Daniel"
+            email: 'bawa@gmail.com',
+            password: "bawa"
         })        
         expect(response.body.message).toBe("You have successfully logged in")
         expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
@@ -157,8 +166,7 @@ describe('Sign up route test', () => {
 })
 
 describe('Update account details route', () => {
-    test('201 status code for a successful request, valid update request', async () => {
-        
+    test('201 status code for a successful request, valid update details', async () => {
         const response = await request(app)
         .patch('/user/update_account_details')
         .set('Authorization', `Bearer ${token}`)
@@ -170,9 +178,64 @@ describe('Update account details route', () => {
             email: "danielsumah@gmail.com",
             phone_number: "09029326141"
         })
-
-        console.log(response.body)
         expect(response.body.message).toBe("Account details updated")
+        expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+        expect(response.statusCode).toBe(200);
+    })
+
+    test('When new email already exists', async () => {
+        const response = await request(app)
+        .patch('/user/update_account_details')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+            first_name: "Dan",
+            last_name: "Isunoya",
+            business_name: "Daniiieee Shoes",
+            payment_link: "https://paystack.com/pay/timpel",
+            email: "seunoduez@gmail.com",
+            phone_number: "09029326141"
+        })
+        console.log(response.body)
+        expect(response.body.message).toBe("Email already exists")
+        expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+        expect(response.statusCode).toBe(400);
+    })
+
+    test('When new phone_number already exists', async () => {
+        const response = await request(app)
+        .patch('/user/update_account_details')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+            first_name: "Dan",
+            last_name: "Isunoya",
+            business_name: "Daniiieee Shoes",
+            payment_link: "https://paystack.com/pay/timpel",
+            email: "danielsumah@gmail.com",
+            phone_number: "09066318539"
+        })
+        expect(response.body.message).toBe("Phone number already exists")
+        expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+        expect(response.statusCode).toBe(400);
+    })
+
+    test('When req.body is empty', async () => {
+        const response = await request(app)
+        .patch('/user/update_account_details')
+        .set('Authorization', `Bearer ${token}`)
+        .send({})
+        expect(response.body.message).toBe("Please enter all fields")
+        expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+        expect(response.statusCode).toBe(400);
+    })
+})
+
+describe('Get a user route', () => {
+    test('Successful request to get a user', async () => {
+        const response = await request(app)
+        .get('/user/get_a_user')
+        .set('Authorization', `Bearer ${token}`)
+        // console.log(response.body)
+        expect(response.body.message).not.toBe("User does not exist")
         expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
         expect(response.statusCode).toBe(200);
     })
