@@ -240,3 +240,15 @@ describe('Get a user route', () => {
         expect(response.statusCode).toBe(200);
     })
 })
+
+describe('Delete user route', () => {
+    test('Successfully delete a user', async () => {
+        const response = await request(app)
+        .delete('/user/delete_account')
+        .set('Authorization', `Bearer ${token}`)
+        console.log(response.body)
+        expect(response.body.message).toBe("Your account has been deleted.")
+        expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+        expect(response.statusCode).toBe(200);
+    })
+})
