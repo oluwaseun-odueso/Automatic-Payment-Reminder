@@ -25,7 +25,7 @@ router.post('/create_invoice', verifyToken, async (req, res) => {
                 invoice
             })
         } catch (error) { res.send({message : error.message}) }
-    } else res.status(400).send({ errno: "101", message: "Please enter all required fields correctly." })
+    } else res.status(400).send({ errno: "101", message: "Please enter all fields correctly" })
 })
 
 router.get('/get_all_invoices', verifyToken, async (req, res) => {

@@ -1,7 +1,6 @@
 const request = require('supertest')
 const app = require('../app')
 
-
 beforeAll(async () => {
     const response = await request(app).post('/user/login')
     .send({
