@@ -36,7 +36,7 @@ router.post('/create_client', verifyToken, async (req, res) => {
                 client
             })
         } catch (error) { res.send({message : error.message}) }
-    } else res.status(400).send({ errno: "101", message: "Please enter all required fields correctly." })
+    } else res.status(400).send({ errno: "101", message: "Please enter all required fields" })
 })
 
 router.patch('/update_client_details/:id', verifyToken, async (req, res) => {
@@ -62,7 +62,7 @@ router.patch('/update_client_details/:id', verifyToken, async (req, res) => {
             }
             await updateClientDetails(req.user.id, req.params.id, name, email, phone_number)
             const updated = await getClientById(req.params.id, req.user.id)
-            res.status(201).send(updated)
+            res.status(200).send({message: "Successfully updated client details", updated})
             
          } catch (error) { res.send({message : error.message}) }
     }
@@ -83,7 +83,7 @@ router.get('/get_client/:id', verifyToken, async (req, res) => {
 router.get('/get_all_clients', verifyToken, async (req, res) => {
     try {
         const clients = await getAllClients(req.user.id)
-        res.status(200).send(clients)
+        res.status(200).send({message: "All clients", clients})
     } catch (error) { res.send({message : error.message}) }
 })
 
@@ -91,7 +91,7 @@ router.delete('/delete_client/:id', verifyToken, async (req, res) => {
     try {
         const result = await deleteAClient(req.params.id, req.user.id)
         if (result ) {
-            res.status(200).send({message: "Client has been deleted."})
+            res.status(200).send({message: "Client has been deleted"})
             return
         }
         res.status(400).send({message: "Client does not exist"})

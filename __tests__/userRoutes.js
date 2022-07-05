@@ -256,7 +256,6 @@ describe('Get all users route', () => {
         const response = await request(app)
         .get('/user/get_all_users')
         .set('Authorization', `Bearer ${token}`)
-        console.log(response.body)
         expect(response.body.message).not.toBe("All users")
         expect(response.body.message).toBe("You are unauthourized to perform this action")
         expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
