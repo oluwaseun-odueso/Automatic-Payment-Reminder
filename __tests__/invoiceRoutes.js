@@ -49,3 +49,14 @@ describe('Get all invoices route', () => {
     expect(response.statusCode).toBe(200);
   })
 })
+
+describe('Get an invoice route', () => {
+  test('Get an invoice', async () => {
+    const response = await request(app)
+    .get(`/invoice/get_invoice/${11}`)
+    .set('Authorization', `Bearer ${token}`)
+    expect(response.body.message).not.toBe("Invoice does not exist")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(200);
+  })
+})

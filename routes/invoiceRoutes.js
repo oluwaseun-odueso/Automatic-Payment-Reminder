@@ -42,7 +42,7 @@ router.get('/get_invoice/:id', verifyToken, async (req, res) => {
             res.status(400).send({ message: "Invoice does not exist" })
             return
         }
-        res.status(200).send({message: "Client invoice", invoice})
+        res.status(200).send(invoice)
     } catch (error) { res.send({message : error.message}) }
 })
 
