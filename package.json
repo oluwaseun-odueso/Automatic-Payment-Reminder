@@ -1,5 +1,9 @@
 {
   "name": "automated-payment-reminder-app",
+  "jest": {
+    "verbose": true,
+    "modulePathIgnorePatterns": ["userRoutes.js"]
+  },
   "version": "1.0.0",
   "description": "Automated Payment Reminder",
   "main": "app.js",

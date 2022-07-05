@@ -1,5 +1,5 @@
 function auth (req, res, next) {
-    if (req.user.is_admin == true) {
+    if (req.user.is_admin == "true") {
         next()
     } else {
         res.status(400).json({
@@ -9,6 +9,4 @@ function auth (req, res, next) {
     }
 }
 
-module.exports = {
-    auth
-}
+module.exports = {auth}

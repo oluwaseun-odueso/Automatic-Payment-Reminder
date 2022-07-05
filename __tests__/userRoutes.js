@@ -19,8 +19,8 @@ let token ;
 beforeAll(async () => {
     const response = await request(app).post('/user/login')
     .send({
-        email: 'bola1@gmail.com',
-        password: "bola1"
+        email: 'blessed@gmail.com',
+        password: "blessed"
       })
     token = response.body.token;
   });
@@ -234,7 +234,6 @@ describe('Get a user route', () => {
         const response = await request(app)
         .get('/user/get_a_user')
         .set('Authorization', `Bearer ${token}`)
-        // console.log(response.body)
         expect(response.body.message).not.toBe("User does not exist")
         expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
         expect(response.statusCode).toBe(200);
@@ -246,9 +245,21 @@ describe('Delete user route', () => {
         const response = await request(app)
         .delete('/user/delete_account')
         .set('Authorization', `Bearer ${token}`)
-        console.log(response.body)
         expect(response.body.message).toBe("Your account has been deleted.")
         expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
         expect(response.statusCode).toBe(200);
+    })
+})
+
+describe('Get all users route', () => {
+    test('Get all users', async () => {
+        const response = await request(app)
+        .get('/user/get_all_users')
+        .set('Authorization', `Bearer ${token}`)
+        console.log(response.body)
+        expect(response.body.message).not.toBe("All users")
+        expect(response.body.message).toBe("You are unauthourized to perform this action")
+        expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+        expect(response.statusCode).toBe(400);
     })
 })

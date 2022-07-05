@@ -1,5 +1,6 @@
 const express = require('express')
 const {generateToken, verifyToken} = require('../config/auth')
+const {auth} = require('../middleware/adminMiddleware')
 const {
     createUser, 
     checkEmail,
@@ -50,8 +51,8 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/signUp', async(req, res) => {
-    if (req.body.first_name && req.body.last_name && req.body.business_name && req.body.payment_link && req.body.email && req.body.phone_number && req.body.password && req.body.confirm_password) {
-        const {first_name, last_name, business_name, payment_link, email, phone_number, password, confirm_password} = req.body
+    if (req.body.first_name && req.body.last_name && req.body.business_name && req.body.payment_link && req.body.email && req.body.phone_number && req.body.is_admin && req.body.password && req.body.confirm_password) {
+        const {first_name, last_name, business_name, payment_link, email, phone_number, is_admin, password, confirm_password} = req.body
         try {
             if ( await checkEmailAndPhoneNumber (email, phone_number) ) {
                 res.status(400).send({ message : "Email and phone number already exists"}) 
@@ -71,7 +72,7 @@ router.post('/signUp', async(req, res) => {
             }
 
             const hashedPassword = await hashEnteredPassword(password)
-            await createUser(first_name, last_name, business_name, payment_link, email, phone_number, hashedPassword)
+            await createUser(first_name, last_name, business_name, payment_link, email, phone_number, is_admin, hashedPassword)
             const user = await getDetailsByEmail(email)
             res.status(201).send({
                 message : "New user added", 
@@ -79,13 +80,13 @@ router.post('/signUp', async(req, res) => {
             })
 
         } catch (error) { res.send({message : error.message}) }
-    } else res.status(400).send({ errno: "101", message: "Please enter all fields" })
+    } else res.status(400).send({ errno: "102", message: "Please enter all fields" })
 })
 
 
 router.patch('/update_account_details', verifyToken, async(req, res) => {
-    if (req.body.first_name && req.body.last_name && req.body.business_name && req.body.payment_link && req.body.email && req.body.phone_number) {
-        const { first_name, last_name, business_name, payment_link, email, phone_number} = req.body
+    if (req.body.first_name && req.body.last_name && req.body.business_name && req.body.payment_link && req.body.email && req.body.phone_number && req.body.is_admin) {
+        const { first_name, last_name, business_name, payment_link, email, phone_number, is_admin} = req.body
         const user = await getDetailsById(req.user.id)
         try {
             // If email exists in database and email is not user's existing email
@@ -99,12 +100,12 @@ router.patch('/update_account_details', verifyToken, async(req, res) => {
                 res.status(400).send({message: "Phone number already exists"})
                 return
             }
-            await updateAccountDetails(req.user.id, first_name, last_name, business_name, payment_link, email, phone_number)
+            await updateAccountDetails(req.user.id, first_name, last_name, business_name, payment_link, email, phone_number, is_admin)
             const updated = await getDetailsById(req.user.id)
             res.status(200).send({message: 'Account details updated', updated})
         } catch (error) { res.send({message : error.message}) }
     }
-    else res.status(400).send({ errno: "101", message: "Please enter all fields" })
+    else res.status(400).send({ errno: "103", message: "Please enter all fields" })
 })
 
 router.delete('/delete_account', verifyToken, async (req, res) => {
@@ -129,10 +130,11 @@ router.get('/get_a_user', verifyToken, async (req, res) => {
     } catch (error) { res.send({message : error.message}) }
 })
 
-router.get('/get_all_users', async (req, res) => {
+router.get('/get_all_users', verifyToken, auth, async (req, res) => {
     try {
+        console.log(req.user.is_admin)
         const users = await getAllUsers()
-        res.status(200).send(users)
+        res.status(200).send({message: "All users", users})
     } catch (error) { res.send({message : error.message}) } 
 })
 
