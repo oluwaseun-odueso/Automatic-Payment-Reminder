@@ -78,3 +78,72 @@ describe('Add client route', () => {
     expect(response.statusCode).toBe(400);
   })
 })
+
+describe('Update client details route', () => {
+  test('With valid client new details', async () => {
+    const response = await request(app)
+    .patch(`/client/update_client_details/${31}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+        "name": "Gan Peterson",
+        "email": "ganipeters@gmail.com",
+        "phone_number": "07048845282"
+    })
+    expect(response.body.message).toBe("Successfully updated client details")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(200);
+  })
+
+  test('A non existing client', async () => {
+    const response = await request(app)
+    .patch(`/client/update_client_details/${40}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+        "name": "Gan Peterson",
+        "email": "ganpeters@gmail.com",
+        "phone_number": "09071841522"
+    })
+    expect(response.body.message).toBe("Client does not exist")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+
+
+  test('With existing email', async () => {
+    const response = await request(app)
+    .patch(`/client/update_client_details/${31}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+        "name": "Gan Peterson",
+        "email": "midebanks@gmail.com",
+        "phone_number": "07048845282"
+    })
+    expect(response.body.message).toBe("Email already exists")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+
+  test('With existing phone number', async () => {
+    const response = await request(app)
+    .patch(`/client/update_client_details/${31}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+        "name": "Gan Peterson",
+        "email": "ganpeters@gmail.com",
+        "phone_number": "09071841522"
+    })
+    expect(response.body.message).toBe("Phone number already exists")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+
+  test('With no detail field', async () => {
+    const response = await request(app)
+    .patch(`/client/update_client_details/${31}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({})
+    expect(response.body.message).toBe("Please enter all fields")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+})
