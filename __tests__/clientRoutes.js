@@ -159,14 +159,3 @@ describe('Get a client route', () => {
     expect(response.statusCode).toBe(200);
   })
 })
-
-describe('Get all clients route', () => {
-  test('Get all clients', async () => {
-    const response = await request(app)
-    .get('/client/get_all_clients')
-    .set('Authorization', `Bearer ${token}`)
-    expect(response.body.message).toBe("All clients")
-    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
-    expect(response.statusCode).toBe(200);
-  })
-})
