@@ -28,7 +28,7 @@ describe('Create invoice route', () => {
       expect(response.statusCode).toBe(201);
   })
 
-  test.only('Successful create request', async () => {
+  test('Successful create request', async () => {
     const response = await request(app)
     .post('/invoice/create_invoice')
     .set('Authorization', `Bearer ${token}`)
@@ -36,5 +36,16 @@ describe('Create invoice route', () => {
     expect(response.body.message).toBe("Please enter all fields correctly")
     expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
     expect(response.statusCode).toBe(400);
+  })
 })
+
+describe('Get all invoices route', () => {
+  test('All invoices', async () => {
+    const response = await request(app)
+    .get('/invoice/get_all_invoices')
+    .set('Authorization', `Bearer ${token}`)
+    expect(response.body.message).toBe("All invoices")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(200);
+  })
 })

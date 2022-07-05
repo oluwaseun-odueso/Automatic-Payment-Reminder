@@ -30,8 +30,8 @@ router.post('/create_invoice', verifyToken, async (req, res) => {
 
 router.get('/get_all_invoices', verifyToken, async (req, res) => {
     try {
-        const clients = await getAllInvoices(req.user.id)
-        res.status(200).send(clients)
+        const invoices = await getAllInvoices(req.user.id)
+        res.status(200).send({message: "All invoices", invoices})
     } catch (error) { res.send({message : error.message}) }
 })
 
@@ -42,7 +42,7 @@ router.get('/get_invoice/:id', verifyToken, async (req, res) => {
             res.status(400).send({ message: "Invoice does not exist" })
             return
         }
-        res.status(200).send(invoice)
+        res.status(200).send({message: "Client invoice", invoice})
     } catch (error) { res.send({message : error.message}) }
 })
 
