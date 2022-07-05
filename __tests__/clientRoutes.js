@@ -171,3 +171,22 @@ describe('Get all clients route', () => {
   })
 })
 
+describe('Delete client route', () => {
+  test('With valid client id', async () => {
+    const response = await request(app)
+    .delete(`/client/delete_client/${36}`)
+    .set('Authorization', `Bearer ${token}`)
+    expect(response.body.message).toBe("Client has been deleted")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(200);
+  })
+
+  test('With non-valid client id', async () => {
+    const response = await request(app)
+    .delete(`/client/delete_client/${34}`)
+    .set('Authorization', `Bearer ${token}`)
+    expect(response.body.message).toBe("Client does not exist")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+})
