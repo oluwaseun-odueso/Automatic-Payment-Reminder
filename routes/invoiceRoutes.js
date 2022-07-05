@@ -70,7 +70,7 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
     try {
         const result = await deleteAnInvoice(req.params.id, req.user.id)
         if ( result) {
-            res.status(200).send({message: "Invoice has been deleted."})
+            res.status(200).send({message: "Invoice has been deleted"})
             return
         }
         res.status(400).send({message: "Invoice does not exist"})
