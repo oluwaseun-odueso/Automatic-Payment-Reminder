@@ -39,6 +39,54 @@ describe('Create invoice route', () => {
   })
 })
 
+
+describe('Update invoice details route', () => {
+  test('With valid invoice new details', async () => {
+    const response = await request(app)
+    .patch(`/invoice/update_invoice_details/${13}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      "client_id": 32,
+      "item": "Vitafoam family bed",
+      "quantity": 1,
+      "unit_price": "28,000",
+      "total": "28,000",
+      "payment_status": "unpaid"
+    })
+    expect(response.body.message).toBe("Invoice updated")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(200);
+  })
+
+  test('A non existing invoice', async () => {
+    const response = await request(app)
+    .patch(`/invoice/update_invoice_details/${15}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({
+      "client_id": 32,
+      "item": "Vitafoam student bed",
+      "quantity": 1,
+      "unit_price": "28,000",
+      "total": "28,000",
+      "payment_status": "unpaid"
+    })
+    expect(response.body.message).toBe("Invoice does not exist")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+
+  test('With no update detail field', async () => {
+    const response = await request(app)
+    .patch(`/invoice/update_invoice_details/${13}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({})
+    expect(response.body.message).toBe("Please enter all fields")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+})
+
+
 describe('Get all invoices route', () => {
   test('All invoices', async () => {
     const response = await request(app)

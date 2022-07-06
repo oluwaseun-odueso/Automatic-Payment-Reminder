@@ -47,17 +47,18 @@ router.get('/get_invoice/:id', verifyToken, async (req, res) => {
 })
 
 router.patch('/update_invoice_details/:id', verifyToken, async (req, res) => {
-    if (req.body.client_id, req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total && req.body.payment_status) {
-        const {client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status} = req.body
+    if (req.body.client_id && req.body.item && req.body.quantity && req.body.unit_price && req.body.total && req.body.payment_status) {
+        const {client_id, item, quantity, unit_price, total, payment_status} = req.body
         try {
+            const client = await getClientById(client_id, req.user.id)
             const checkIfInvoiceExists = await getInvoiceById(req.params.id, req.user.id)
             if ( ! checkIfInvoiceExists) {
                 res.status(400).send({ message: "Invoice does not exist" })
                 return
             }
-            await updateInvoiceDetails(req.user.id, req.params.id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status)
+            await updateInvoiceDetails(req.user.id, req.params.id, client_id, client.name, client.email, client.phone_number, item, quantity, unit_price, total, payment_status)
             const invoice = await getInvoiceById(req.params.id, req.user.id)
-            res.status(201).send({
+            res.status(200).send({
                 message: "Invoice updated",
                 invoice
             })
