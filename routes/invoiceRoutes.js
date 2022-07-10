@@ -25,13 +25,13 @@ router.post('/create_invoice', verifyToken, async (req, res) => {
                 invoice
             })
         } catch (error) { res.send({message : error.message}) }
-    } else res.status(400).send({ errno: "101", message: "Please enter all required fields correctly." })
+    } else res.status(400).send({ errno: "101", message: "Please enter all fields correctly" })
 })
 
 router.get('/get_all_invoices', verifyToken, async (req, res) => {
     try {
-        const clients = await getAllInvoices(req.user.id)
-        res.status(200).send(clients)
+        const invoices = await getAllInvoices(req.user.id)
+        res.status(200).send({message: "All invoices", invoices})
     } catch (error) { res.send({message : error.message}) }
 })
 
@@ -47,17 +47,18 @@ router.get('/get_invoice/:id', verifyToken, async (req, res) => {
 })
 
 router.patch('/update_invoice_details/:id', verifyToken, async (req, res) => {
-    if (req.body.client_id, req.body.client_name && req.body.email && req.body.phone_number && req.body.item && req.body.quantity && req.body.unit_price && req.body.total && req.body.payment_status) {
-        const {client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status} = req.body
+    if (req.body.client_id && req.body.item && req.body.quantity && req.body.unit_price && req.body.total && req.body.payment_status) {
+        const {client_id, item, quantity, unit_price, total, payment_status} = req.body
         try {
+            const client = await getClientById(client_id, req.user.id)
             const checkIfInvoiceExists = await getInvoiceById(req.params.id, req.user.id)
             if ( ! checkIfInvoiceExists) {
                 res.status(400).send({ message: "Invoice does not exist" })
                 return
             }
-            await updateInvoiceDetails(req.user.id, req.params.id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status)
+            await updateInvoiceDetails(req.user.id, req.params.id, client_id, client.name, client.email, client.phone_number, item, quantity, unit_price, total, payment_status)
             const invoice = await getInvoiceById(req.params.id, req.user.id)
-            res.status(201).send({
+            res.status(200).send({
                 message: "Invoice updated",
                 invoice
             })
@@ -70,7 +71,7 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
     try {
         const result = await deleteAnInvoice(req.params.id, req.user.id)
         if ( result) {
-            res.status(200).send({message: "Invoice has been deleted."})
+            res.status(200).send({message: "Invoice has been deleted"})
             return
         }
         res.status(400).send({message: "Invoice does not exist"})
@@ -88,14 +89,14 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         await SendEmail.sendInvoice(invoice, req.user.payment_link)
 
         // Start invoice reminder cron job
-        startEndReminderCronJob(invoice, req.user.payment_link)
+        await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
 
 
         // if (invoice.payment_status === 'unpaid') {
         // await invoice_reminder(req.user.payment_link, req.params.id, req.user.id)
         // }
     
-        res.status(200).send({ message: "Mail has been sent to client." })
+        res.status(200).send({ message: "Mail has been sent to client" })
 
     } catch (error) { res.send({message : error.message}) }
 })

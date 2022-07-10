@@ -24,9 +24,21 @@ async function getAllInvoices (user_id) {
 async function getInvoiceById (id, user_id) {
     try {
         const selected = await Invoice.findOne({  
-            where: { id , user_id}
+            where: { id , user_id }
         });
         return selected
+    } catch (error) {
+        return error
+    }
+}
+
+async function checkIfInvoiceIsPaid(id, user_id) {
+    try {
+        const response = await Invoice.findOne({
+            attributes: [ "payment_status" ]  ,
+            where: { id, user_id }
+        })
+        return response.payment_status === 'paid' ? true : false
     } catch (error) {
         return error
     }
@@ -60,7 +72,8 @@ const functions = {
     getAllInvoices,
     getInvoiceById,
     deleteAnInvoice,
-    updateInvoiceDetails
+    updateInvoiceDetails, 
+    checkIfInvoiceIsPaid
 }
 
 module.exports = functions
