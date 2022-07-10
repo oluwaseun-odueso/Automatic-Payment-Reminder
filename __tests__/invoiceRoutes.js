@@ -101,7 +101,7 @@ describe('Get all invoices route', () => {
 describe('Get an invoice route', () => {
   test('Get an invoice', async () => {
     const response = await request(app)
-    .get(`/invoice/get_invoice/${11}`)
+    .get(`/invoice/get_invoice/${13}`)
     .set('Authorization', `Bearer ${token}`)
     expect(response.body.message).not.toBe("Invoice does not exist")
     expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
@@ -122,6 +122,26 @@ describe('Delete invoice route', () => {
   test('With non-valid invoice id', async () => {
     const response = await request(app)
     .delete(`/invoice/delete_invoice/${11}`)
+    .set('Authorization', `Bearer ${token}`)
+    expect(response.body.message).toBe("Invoice does not exist")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(400);
+  })
+})
+
+describe('Send invoice to email', () => {
+  test('Successful request', async () => {
+    const response = await request(app)
+    .post(`/invoice/send_invoice/${13}`)
+    .set('Authorization', `Bearer ${token}`)
+    expect(response.body.message).toBe("Mail has been sent to client")
+    expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    expect(response.statusCode).toBe(200);
+  })
+
+  test.only('Successful request', async () => {
+    const response = await request(app)
+    .post(`/invoice/send_invoice/${17}`)
     .set('Authorization', `Bearer ${token}`)
     expect(response.body.message).toBe("Invoice does not exist")
     expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));

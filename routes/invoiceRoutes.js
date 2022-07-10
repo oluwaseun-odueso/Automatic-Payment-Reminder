@@ -96,7 +96,7 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         // await invoice_reminder(req.user.payment_link, req.params.id, req.user.id)
         // }
     
-        res.status(200).send({ message: "Mail has been sent to client." })
+        res.status(200).send({ message: "Mail has been sent to client" })
 
     } catch (error) { res.send({message : error.message}) }
 })
