@@ -2,6 +2,7 @@ const express = require('express')
 require('dotenv').config();
 const { verifyToken } = require('../config/auth')
 const SendEmail = require('../config/emailConfig')
+const Payment = require('../config/')
 const startEndReminderCronJob = require('../job/reminder')
 const {
     createInvoice, 
@@ -78,6 +79,24 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
     } catch (error) { res.send({message : error.message}) }
 })
 
+// router.post('/send_invoice/:id', verifyToken, async (req, res) => {
+//     try {
+//         const invoice = await getInvoiceById(req.params.id, req.user.id)
+//         if ( ! invoice) {
+//             res.status(400).send({ message: "Invoice does not exist" })
+//             return
+//         }
+//         console.log(invoice.payment_status)
+//         await SendEmail.sendInvoice(invoice, req.user.payment_link)
+
+//         // Start invoice reminder cron job
+//         await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
+    
+//         res.status(200).send({ message: "Mail has been sent to client" })
+
+//     } catch (error) { res.send({message : error.message}) }
+// })
+
 router.post('/send_invoice/:id', verifyToken, async (req, res) => {
     try {
         const invoice = await getInvoiceById(req.params.id, req.user.id)
@@ -86,15 +105,10 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
             return
         }
         console.log(invoice.payment_status)
-        await SendEmail.sendInvoice(invoice, req.user.payment_link)
+        await SendEmail.sendInvoice(invoice, payment_link)
 
         // Start invoice reminder cron job
         await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
-
-
-        // if (invoice.payment_status === 'unpaid') {
-        // await invoice_reminder(req.user.payment_link, req.params.id, req.user.id)
-        // }
     
         res.status(200).send({ message: "Mail has been sent to client" })
 

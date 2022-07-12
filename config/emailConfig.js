@@ -42,7 +42,34 @@ class SendEmail {
         } catch (error) { return error }
     }
 
-    async sendInvoice (invoice, link) {
+    // async sendInvoice (invoice, link) {
+    //     try {
+    //         const options = {
+    //             from: "seunoduez@gmail.com",
+    //             to: invoice.email,
+    //             subject: "Invoice alert",
+    //             text: `Dear esteemed client, this is an 
+    //             invoice of your previous purchase for
+    //             item: ${invoice.item},
+    //             invoice id: ${invoice.id},
+    //             quantity: ${invoice.quantity},
+    //             unit price: ${invoice.unit_price},
+    //             total price: ${invoice.total},
+    //             from us, find the link to pay below, thank you for your patronage .
+                
+    //             link: ${link}`  
+    //         }; 
+    //         this._transporter.sendMail(options, function(err, info) {
+    //             if(err) {
+    //                 console.log(err);
+    //                 return;
+    //             } 
+    //             console.log("Email sent: " + info.response);
+    //         })
+    //     } catch (error) { return error }
+    // }
+
+    async sendInvoice (invoice) {
         try {
             const options = {
                 from: "seunoduez@gmail.com",
@@ -57,7 +84,7 @@ class SendEmail {
                 total price: ${invoice.total},
                 from us, find the link to pay below, thank you for your patronage .
                 
-                link: ${link}`  
+                // link: ${link}`  
             }; 
             this._transporter.sendMail(options, function(err, info) {
                 if(err) {

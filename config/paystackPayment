@@ -1,0 +1,39 @@
+const axios = require('axios');
+require('dotenv').config();
+
+class Payment {
+    constructor () {
+        this.secret_key = process.env.PAYSTACK_TOKEN
+    }
+
+    async initializePayment (data) {
+        try {
+            // const data = '{ "amount": "50000" , "email": "seunoduez@gmail.com"}'
+            const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                    "Authorization": 'Bearer ' + this.secret_key
+                }
+            })
+            return (response.data.authorization_url)
+        } catch (error) {
+            return error.response.data
+        }
+    }
+
+    async verifyPayment (reference) {
+        try {
+            const response = await axios.get(`https://api.paystack.co/transaction/verify/${req.body.reference}`,{
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                    "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
+                },
+            })
+            return response
+        } catch (error) {
+            return error
+        }
+    }
+}
+
+module.exports = new initializePayment
