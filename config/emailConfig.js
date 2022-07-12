@@ -69,7 +69,7 @@ class SendEmail {
     //     } catch (error) { return error }
     // }
 
-    async sendInvoice (invoice) {
+    async sendInvoice (invoice, payment_link) {
         try {
             const options = {
                 from: "seunoduez@gmail.com",
@@ -84,7 +84,7 @@ class SendEmail {
                 total price: ${invoice.total},
                 from us, find the link to pay below, thank you for your patronage .
                 
-                // link: ${link}`  
+                // link: ${payment_link}`  
             }; 
             this._transporter.sendMail(options, function(err, info) {
                 if(err) {

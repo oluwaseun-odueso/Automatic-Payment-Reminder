@@ -2,7 +2,8 @@ const express = require('express')
 require('dotenv').config();
 const { verifyToken } = require('../config/auth')
 const SendEmail = require('../config/emailConfig')
-const Payment = require('../config/')
+const Payment = require('../config/paystackPayment')
+const axios = require('axios')
 const startEndReminderCronJob = require('../job/reminder')
 const {
     createInvoice, 
@@ -97,6 +98,24 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
 //     } catch (error) { res.send({message : error.message}) }
 // })
 
+async function initializeTransaction (data) {
+    try {
+        console.log(data)
+        // const data = '{ "amount": "5000000" , "email": "seunoduez@gmail.com"}'
+        const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
+            }
+        })
+        console.log(response.data)
+        return response.data.data.authorization_url
+    } catch (error) {
+        // res.status(400).send(error.response.data)
+        return error.response.data
+    }
+}
+
 router.post('/send_invoice/:id', verifyToken, async (req, res) => {
     try {
         const invoice = await getInvoiceById(req.params.id, req.user.id)
@@ -104,11 +123,14 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
             res.status(400).send({ message: "Invoice does not exist" })
             return
         }
-        console.log(invoice.payment_status)
-        await SendEmail.sendInvoice(invoice, payment_link)
+        const data = JSON.stringify({"amount": (invoice.total * 100), "email": invoice.email})
+        const response = await initializeTransaction(data)
+        console.log(response)
+        
+        await SendEmail.sendInvoice(invoice, response)
 
         // Start invoice reminder cron job
-        await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
+        // await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
     
         res.status(200).send({ message: "Mail has been sent to client" })
 

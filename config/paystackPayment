@@ -6,7 +6,7 @@ class Payment {
         this.secret_key = process.env.PAYSTACK_TOKEN
     }
 
-    async initializePayment (data) {
+    async initializeTransaction (data) {
         try {
             // const data = '{ "amount": "50000" , "email": "seunoduez@gmail.com"}'
             const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
@@ -23,7 +23,7 @@ class Payment {
 
     async verifyPayment (reference) {
         try {
-            const response = await axios.get(`https://api.paystack.co/transaction/verify/${req.body.reference}`,{
+            const response = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`,{
                 headers: {
                     "Content-type": "application/json; charset=UTF-8",
                     "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
@@ -36,4 +36,4 @@ class Payment {
     }
 }
 
-module.exports = new initializePayment
+module.exports = new Payment
