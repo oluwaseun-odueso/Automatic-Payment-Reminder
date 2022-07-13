@@ -12,7 +12,38 @@ class SendEmail {
         });
     }
 
-    async sendReminder (invoice, link) {
+    // async sendReminder (invoice, link) {
+    //     try {
+    //         const options = {
+    //             from: "seunoduez@gmail.com",
+    //             to: invoice.email,
+    //             subject: "Alert for overdue payment.",
+    //             text: `Dear esteemed client, this is a 
+    //             reminder of the payment of your 
+    //             previous purchase for
+    //             item: ${invoice.item},
+    //             invoice id: ${invoice.id},
+    //             quantity: ${invoice.quantity},
+    //             unit price: ${invoice.unit_price},
+    //             total price: ${invoice.total},
+    //             from us is now overdue, 
+    //             find the link to pay below, thank you for your patronage.
+
+    //             link: ${link}`  
+    //         };
+    
+    //         this._transporter.sendMail(options, function(err, info) {
+    //             if(err) {
+    //                 console.log(err);
+    //                 return;
+    //             }
+    //             console.log("Email sent: " + info.response);
+    //         })
+    //     } catch (error) { return error }
+    // }
+
+    
+    async sendReminder (invoice, payment_link) {
         try {
             const options = {
                 from: "seunoduez@gmail.com",
@@ -29,7 +60,7 @@ class SendEmail {
                 from us is now overdue, 
                 find the link to pay below, thank you for your patronage.
 
-                link: ${link}`  
+                link: ${payment_link}`  
             };
     
             this._transporter.sendMail(options, function(err, info) {
@@ -84,7 +115,7 @@ class SendEmail {
                 total price: ${invoice.total},
                 from us, find the link to pay below, thank you for your patronage .
                 
-                // link: ${payment_link}`  
+                link: ${payment_link}`  
             }; 
             this._transporter.sendMail(options, function(err, info) {
                 if(err) {

@@ -10,6 +10,7 @@ const {
     getAllInvoices,
     getInvoiceById,
     deleteAnInvoice,
+    updateReferenceNumber,
     updateInvoiceDetails
 } = require('../controllers/invoiceRoutesFunctions')
 const {getClientById} = require('../controllers/clientRoutesFunctions');
@@ -100,7 +101,6 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
 
 async function initializeTransaction (data) {
     try {
-        console.log(data)
         // const data = '{ "amount": "5000000" , "email": "seunoduez@gmail.com"}'
         const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
             headers: {
@@ -108,10 +108,8 @@ async function initializeTransaction (data) {
                 "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
             }
         })
-        console.log(response.data)
-        return response.data.data.authorization_url
+        return response.data.data
     } catch (error) {
-        // res.status(400).send(error.response.data)
         return error.response.data
     }
 }
@@ -124,17 +122,20 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
             return
         }
         const data = JSON.stringify({"amount": (invoice.total * 100), "email": invoice.email})
-        const response = await initializeTransaction(data)
-        console.log(response)
+        const response = await Payment.initializeTransaction(data)
         
-        await SendEmail.sendInvoice(invoice, response)
+        await SendEmail.sendInvoice(invoice, response.authorization_url)
+        await updateReferenceNumber(req.params.id, req.user.id, response.reference)
 
         // Start invoice reminder cron job
-        // await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
+        await startEndReminderCronJob(invoice, response.authorization_url, response.reference)
     
         res.status(200).send({ message: "Mail has been sent to client" })
 
-    } catch (error) { res.send({message : error.message}) }
+    } catch (error) { 
+        res.status(400).send({ message : error.message}) 
+        // console.log(error) 
+    }
 })
 
 module.exports = router

@@ -51,7 +51,7 @@ app.get('/verify_payment', async (req, res) => {
                 "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
             },
         })
-        console.log(response.data.data.status == 'abandoned')
+        console.log(response.data.data.status)
         res.send(response.data.data)
     } catch (error) {
         res.send(error)

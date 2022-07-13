@@ -8,16 +8,15 @@ class Payment {
 
     async initializeTransaction (data) {
         try {
-            // const data = '{ "amount": "50000" , "email": "seunoduez@gmail.com"}'
             const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
                 headers: {
                     "Content-type": "application/json; charset=UTF-8",
-                    "Authorization": 'Bearer ' + this.secret_key
+                    "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
                 }
             })
-            return (response.data.authorization_url)
+            return response.data.data
         } catch (error) {
-            return error.response.data
+            throw error.response.data
         }
     }
 
@@ -29,7 +28,8 @@ class Payment {
                     "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
                 },
             })
-            return response
+            // console.log(response.data)
+            return response.data.data
         } catch (error) {
             return error
         }

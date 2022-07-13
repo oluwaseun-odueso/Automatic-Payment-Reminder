@@ -32,6 +32,8 @@ async function getInvoiceById (id, user_id) {
     }
 }
 
+
+
 async function checkIfInvoiceIsPaid(id, user_id) {
     try {
         const response = await Invoice.findOne({
@@ -55,7 +57,18 @@ async function deleteAnInvoice (id, user_id) {
     }
 }
 
-async function updateInvoiceDetails (user_id, id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status) {
+async function updateReferenceNumber (id, user_id, reference) {
+    try {
+        const response = await Invoice.update({reference}, {
+            where: {id, user_id}
+        })
+        return response
+    } catch (error) {
+        return error
+    }
+}
+
+async function updateInvoiceDetails (id, user_id, client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status) {
     try {
         const details = {client_id, client_name, email, phone_number, item, quantity, unit_price, total, payment_status}
         const user = await Invoice.update(details, {
@@ -72,6 +85,7 @@ const functions = {
     getAllInvoices,
     getInvoiceById,
     deleteAnInvoice,
+    updateReferenceNumber,
     updateInvoiceDetails, 
     checkIfInvoiceIsPaid
 }
