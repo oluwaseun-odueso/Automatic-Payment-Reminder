@@ -12,13 +12,6 @@ app.use(express.json())
 
 connection
 
-// const router = express.Router()
-// router.get('/login', (req, res) => {
-//     res.status(200).send('<h1>Hello Express!</h1>')
-// })
-// // localhost:4000/test/login
-// app.use("/test", router)
-
 app.use('/user', userRoute)
 app.use('/client', clientRoute)
 app.use('/invoice', invoiceRoute)
@@ -66,12 +59,12 @@ app.post('/initialize_transaction', async (req, res) => {
                 "Content-type": "application/json; charset=UTF-8",
                 "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
             }
-        })
-        console.log(response.data.data.authorization_url)
-        console.log(response.data.data.reference)
+        }, { timeout: 2000})
         res.status(200).send(response.data)
     } catch (error) {
-        res.status(400).send(error.response.data)
+        if (error.message === 'getaddrinfo ENOTFOUND api.paystack.co') {
+            res.status(500).send({message: "Check your network connection and try again"})
+        }
     }
 })
 

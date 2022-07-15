@@ -99,20 +99,20 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
 //     } catch (error) { res.send({message : error.message}) }
 // })
 
-async function initializeTransaction (data) {
-    try {
-        // const data = '{ "amount": "5000000" , "email": "seunoduez@gmail.com"}'
-        const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
-            headers: {
-                "Content-type": "application/json; charset=UTF-8",
-                "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
-            }
-        })
-        return response.data.data
-    } catch (error) {
-        return error.response.data
-    }
-}
+// async function initializeTransaction (data) {
+//     try {
+//         // const data = '{ "amount": "5000000" , "email": "seunoduez@gmail.com"}'
+//         const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
+//             headers: {
+//                 "Content-type": "application/json; charset=UTF-8",
+//                 "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
+//             }
+//         })
+//         return response.data.data
+//     } catch (error) {
+//         return error.response.data
+//     }
+// }
 
 router.post('/send_invoice/:id', verifyToken, async (req, res) => {
     try {
@@ -133,8 +133,11 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         res.status(200).send({ message: "Mail has been sent to client" })
 
     } catch (error) { 
-        res.status(400).send({ message : error.message}) 
-        // console.log(error) 
+        if (error.message) {
+            res.status(500).send({message: 'Error initializing transaction, please try again'})
+            return
+        }
+        res.status(500).send(error) 
     }
 })
 

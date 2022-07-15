@@ -15,19 +15,6 @@ const Payment = require('../config/paystackPayment')
 //   });
 // }
 
-// async function startEndReminderCronJob (data, invoice, user_id) {
-//   const reminder_invoice_job = cron.schedule('*/20 * * * * *', async () => {
-//     const updatedInvoice = await getInvoiceById(invoice.id, invoice.user_id)
-//     if ( (await Payment.verifyPayment(updatedInvoice.reference)).status === 'success' ) {
-//       endReminderCronJob(reminder_invoice_job)
-//     }
-//     else {
-//       const response = await Payment.initializeTransaction(data)
-//       await updateReferenceNumber(updatedInvoice.id, updatedInvoice.user_id, response.reference)
-//       await SendEmail.sendReminder(updatedInvoice, response.authorization_url)
-//     }
-//   })
-// }
 
 async function startEndReminderCronJob (invoice, payment_link, reference) {
   const reminder_invoice_job = cron.schedule('*/20 * * * * *', async () => {
