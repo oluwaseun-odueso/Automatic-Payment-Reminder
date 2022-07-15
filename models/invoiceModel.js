@@ -39,6 +39,10 @@ const Invoice = connection.define('Invoice', {
         type: DataTypes.STRING, 
         allowNull: false
     },
+    reference: {
+        type: DataTypes.STRING, 
+        allowNull: true
+    },
     payment_status: {
       type: DataTypes.STRING, 
       allowNull: false

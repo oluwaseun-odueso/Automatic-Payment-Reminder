@@ -2,12 +2,15 @@ const express = require('express')
 require('dotenv').config();
 const { verifyToken } = require('../config/auth')
 const SendEmail = require('../config/emailConfig')
+const Payment = require('../config/paystackPayment')
+const axios = require('axios')
 const startEndReminderCronJob = require('../job/reminder')
 const {
     createInvoice, 
     getAllInvoices,
     getInvoiceById,
     deleteAnInvoice,
+    updateReferenceNumber,
     updateInvoiceDetails
 } = require('../controllers/invoiceRoutesFunctions')
 const {getClientById} = require('../controllers/clientRoutesFunctions');
@@ -78,6 +81,39 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
     } catch (error) { res.send({message : error.message}) }
 })
 
+// router.post('/send_invoice/:id', verifyToken, async (req, res) => {
+//     try {
+//         const invoice = await getInvoiceById(req.params.id, req.user.id)
+//         if ( ! invoice) {
+//             res.status(400).send({ message: "Invoice does not exist" })
+//             return
+//         }
+//         console.log(invoice.payment_status)
+//         await SendEmail.sendInvoice(invoice, req.user.payment_link)
+
+//         // Start invoice reminder cron job
+//         await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
+    
+//         res.status(200).send({ message: "Mail has been sent to client" })
+
+//     } catch (error) { res.send({message : error.message}) }
+// })
+
+// async function initializeTransaction (data) {
+//     try {
+//         // const data = '{ "amount": "5000000" , "email": "seunoduez@gmail.com"}'
+//         const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
+//             headers: {
+//                 "Content-type": "application/json; charset=UTF-8",
+//                 "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
+//             }
+//         })
+//         return response.data.data
+//     } catch (error) {
+//         return error.response.data
+//     }
+// }
+
 router.post('/send_invoice/:id', verifyToken, async (req, res) => {
     try {
         const invoice = await getInvoiceById(req.params.id, req.user.id)
@@ -85,20 +121,25 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
             res.status(400).send({ message: "Invoice does not exist" })
             return
         }
-        console.log(invoice.payment_status)
-        await SendEmail.sendInvoice(invoice, req.user.payment_link)
+        const data = JSON.stringify({"amount": (invoice.total * 100), "email": invoice.email})
+        const response = await Payment.initializeTransaction(data)
+        
+        await SendEmail.sendInvoice(invoice, response.authorization_url)
+        await updateReferenceNumber(req.params.id, req.user.id, response.reference)
 
         // Start invoice reminder cron job
-        await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
-
-
-        // if (invoice.payment_status === 'unpaid') {
-        // await invoice_reminder(req.user.payment_link, req.params.id, req.user.id)
-        // }
+        await startEndReminderCronJob(invoice, response.authorization_url, response.reference)
     
         res.status(200).send({ message: "Mail has been sent to client" })
 
-    } catch (error) { res.send({message : error.message}) }
+    } catch (error) { 
+        console.log(error.message)
+        if (error.message) {
+            res.status(500).send({message: 'Error initializing transaction, please try again'})
+            return
+        }
+        res.status(500).send(error) 
+    }
 })
 
 module.exports = router
