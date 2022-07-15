@@ -124,7 +124,7 @@ class SendEmail {
                 } 
                 console.log("Email sent: " + info.response);
             })
-        } catch (error) { return error }
+        } catch (error) { throw error }
     }
 }
 

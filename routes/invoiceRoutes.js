@@ -133,6 +133,7 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         res.status(200).send({ message: "Mail has been sent to client" })
 
     } catch (error) { 
+        console.log(error.message)
         if (error.message) {
             res.status(500).send({message: 'Error initializing transaction, please try again'})
             return
