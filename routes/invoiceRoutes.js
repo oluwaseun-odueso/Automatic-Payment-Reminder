@@ -2,9 +2,10 @@ const express = require('express')
 require('dotenv').config();
 const { verifyToken } = require('../config/auth')
 const SendEmail = require('../config/emailConfig')
-const Payment = require('../config/paystackPayment')
+const Payment = require('../job/paystackPayment')
 const axios = require('axios')
 const startEndReminderCronJob = require('../job/reminder')
+const sendSms = require('../job/sendSms')
 const {
     createInvoice, 
     getAllInvoices,
@@ -81,39 +82,6 @@ router.delete('/delete_invoice/:id', verifyToken, async (req, res) => {
     } catch (error) { res.send({message : error.message}) }
 })
 
-// router.post('/send_invoice/:id', verifyToken, async (req, res) => {
-//     try {
-//         const invoice = await getInvoiceById(req.params.id, req.user.id)
-//         if ( ! invoice) {
-//             res.status(400).send({ message: "Invoice does not exist" })
-//             return
-//         }
-//         console.log(invoice.payment_status)
-//         await SendEmail.sendInvoice(invoice, req.user.payment_link)
-
-//         // Start invoice reminder cron job
-//         await startEndReminderCronJob(invoice, req.user.payment_link, req.user.id)
-    
-//         res.status(200).send({ message: "Mail has been sent to client" })
-
-//     } catch (error) { res.send({message : error.message}) }
-// })
-
-// async function initializeTransaction (data) {
-//     try {
-//         // const data = '{ "amount": "5000000" , "email": "seunoduez@gmail.com"}'
-//         const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
-//             headers: {
-//                 "Content-type": "application/json; charset=UTF-8",
-//                 "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
-//             }
-//         })
-//         return response.data.data
-//     } catch (error) {
-//         return error.response.data
-//     }
-// }
-
 router.post('/send_invoice/:id', verifyToken, async (req, res) => {
     try {
         const invoice = await getInvoiceById(req.params.id, req.user.id)
@@ -125,6 +93,7 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         const response = await Payment.initializeTransaction(data)
         
         await SendEmail.sendInvoice(invoice, response.authorization_url)
+        await sendSms(invoice.phone_number)
         await updateReferenceNumber(req.params.id, req.user.id, response.reference)
 
         // Start invoice reminder cron job
