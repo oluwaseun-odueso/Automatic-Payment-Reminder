@@ -2,7 +2,7 @@ const express = require('express')
 require('dotenv').config();
 const { verifyToken } = require('../config/auth')
 const SendEmail = require('../config/emailConfig')
-const Payment = require('../config/paystackPayment')
+const Payment = require('../job/paystackPayment')
 const axios = require('axios')
 const startEndReminderCronJob = require('../job/reminder')
 const {
