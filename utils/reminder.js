@@ -23,4 +23,4 @@ function endReminderCronJob (job) {
   console.log('Job ended')
 }
 
-module.exports = {startEndReminderCronJob}
+module.exports = startEndReminderCronJob

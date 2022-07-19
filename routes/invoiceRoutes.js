@@ -3,7 +3,7 @@ require('dotenv').config();
 const { verifyToken } = require('../config/auth')
 const SendEmail = require('../utils/emailConfig')
 const Payment = require('../utils/paystackPayment')
-const {startEndReminderCronJob} = require('../utils/reminder')
+const startEndReminderCronJob = require('../utils/reminder')
 const sendSms = require('../utils/sendSms')
 const {
     createInvoice, 
@@ -96,7 +96,7 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         await updateReferenceNumber(req.params.id, req.user.id, response.reference)
 
         // Start invoice reminder cron job
-        
+        await startEndReminderCronJob(invoice, response.authorization_url, response.reference)
     
         res.status(200).send({ message: "Mail has been sent to client" })
 
