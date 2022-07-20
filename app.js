@@ -68,26 +68,6 @@ app.post('/initialize_transaction', async (req, res) => {
     }
 })
 
-// app.post('/send_otp', (req, res) => {
-//     try {
-//         const data = {
-//             'mobile': '2349066318539',
-//             'sender_id': 'SMSINFO',
-//             'message': 'Your otp code is {code}',
-//             'expiry': '900'
-//           }
-//         const response = await axios.post('https://d7networks.com/api/verifier/send', data, {
-//             headers: {
-//                 'Authorization': 'Token {D7 verify token}'
-//             }
-//         })
-//         console.log(response)
-//         res.status(201).send(response)
-//     } catch (error) {
-//         res.status(400).send(error.message)
-//     }
-// })
-
 app.listen(port)
 
 module.exports = app
