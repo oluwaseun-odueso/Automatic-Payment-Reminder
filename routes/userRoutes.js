@@ -1,6 +1,8 @@
 const express = require('express')
 const {generateToken, verifyToken} = require('../config/auth')
 const {auth} = require('../middleware/adminMiddleware')
+const sendSms = require('../utils/sendSms')
+const generateOTP = require('../utils/OTP')
 const {
     createUser, 
     checkEmail,
@@ -70,6 +72,8 @@ router.post('/signUp', async(req, res) => {
                 res.status(400).send({ message : "Passwords do not match."})
                 return
             }
+            const otp = await generateOTP()
+            await sendSms(phone_number, `Your OTP is ${otp}`)
 
             const hashedPassword = await hashEnteredPassword(password)
             await createUser(first_name, last_name, business_name, payment_link, email, phone_number, is_admin, hashedPassword)

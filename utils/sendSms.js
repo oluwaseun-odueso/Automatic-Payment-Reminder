@@ -1,7 +1,7 @@
 const Vonage = require('@vonage/server-sdk')
 require('dotenv').config();
 
-async function sendSms (recipient) {
+async function sendSms (recipient, mssg) {
     const vonage = new Vonage({
         apiKey: process.env.VONAGE_API_KEY,
         apiSecret: process.env.VONAGE_API_SECRET_KEY
@@ -9,7 +9,8 @@ async function sendSms (recipient) {
     
     const from = "2349066318539"
     const to = recipient
-    const text = 'Dear customer, a mail has been sent to your email address containing your invoice details and a payment link to make your payment. Thanks you for your patronage.'
+    const text = mssg
+    // const text = 'Dear customer, a mail has been sent to your email address containing your invoice details and a payment link to make your payment. Thanks you for your patronage.'
     
     await vonage.message.sendSms(from, to, text, (err, responseData) => {
         if (err) {
