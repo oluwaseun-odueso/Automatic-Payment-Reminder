@@ -71,3 +71,4 @@ class SendEmail {
 }
 
 module.exports = new SendEmail
+ 

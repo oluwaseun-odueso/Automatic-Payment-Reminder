@@ -92,7 +92,7 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         const response = await Payment.initializeTransaction(data)
         
         await SendEmail.sendInvoice(invoice, response.authorization_url)
-        // await sendSms(invoice.phone_number, 'Dear customer, a mail has been sent to your email address containing your invoice details and a payment link to make your payment. Thanks you for your patronage.')
+        await sendSms(invoice.phone_number, 'Dear customer, a mail has been sent to your email address containing your invoice details and a payment link to make your payment. Thanks you for your patronage.')
         await updateReferenceNumber(req.params.id, req.user.id, response.reference)
 
         // Start invoice reminder cron job
