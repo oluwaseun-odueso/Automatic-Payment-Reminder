@@ -20,6 +20,7 @@ class Payment {
         }
     }
 
+    // Insert reference number to verify payment
     async verifyPayment (reference) {
         try {
             const response = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`,{
