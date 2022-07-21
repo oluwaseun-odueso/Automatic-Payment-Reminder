@@ -5,7 +5,7 @@ const clientRoute = require('./routes/clientRoutes')
 const invoiceRoute = require('./routes/invoiceRoutes')
 const axios = require('axios');
 require('dotenv').config()
-const port = process.env.PORT
+const port = process.env.PORT || 4000
 const app = express()
 app.use(express.json())
 

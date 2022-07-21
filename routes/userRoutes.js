@@ -72,8 +72,6 @@ router.post('/signUp', async(req, res) => {
                 res.status(400).send({ message : "Passwords do not match."})
                 return
             }
-            const otp = await generateOTP()
-            await sendSms(phone_number, `Your OTP is ${otp}, use this to complete your sign up registration.`)
 
             const hashedPassword = await hashEnteredPassword(password)
             await createUser(first_name, last_name, business_name, payment_link, email, phone_number, is_admin, hashedPassword)
