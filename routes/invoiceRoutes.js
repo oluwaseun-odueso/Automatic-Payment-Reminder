@@ -1,11 +1,10 @@
 const express = require('express')
 require('dotenv').config();
 const { verifyToken } = require('../config/auth')
-const SendEmail = require('../config/emailConfig')
-const Payment = require('../job/paystackPayment')
-const axios = require('axios')
-const startEndReminderCronJob = require('../job/reminder')
-const sendSms = require('../job/sendSms')
+const SendEmail = require('../utils/emailConfig')
+const Payment = require('../utils/paystackPayment')
+const startEndReminderCronJob = require('../utils/reminder')
+const sendSms = require('../utils/sendSms')
 const {
     createInvoice, 
     getAllInvoices,
@@ -93,7 +92,7 @@ router.post('/send_invoice/:id', verifyToken, async (req, res) => {
         const response = await Payment.initializeTransaction(data)
         
         await SendEmail.sendInvoice(invoice, response.authorization_url)
-        await sendSms(invoice.phone_number)
+        await sendSms(invoice.phone_number, 'Dear customer, a mail has been sent to your email address containing your invoice details and a payment link to make your payment. Thanks you for your patronage.')
         await updateReferenceNumber(req.params.id, req.user.id, response.reference)
 
         // Start invoice reminder cron job

@@ -11,7 +11,7 @@ class Payment {
             const response = await axios.post('https://api.paystack.co/transaction/initialize', data, {
                 headers: {
                     "Content-type": "application/json; charset=UTF-8",
-                    "Authorization": 'Bearer ' + process.env.PAYSTACK_TOKEN
+                    "Authorization": 'Bearer ' + this.secret_key
                 }
             })
             return response.data.data
@@ -25,10 +25,9 @@ class Payment {
             const response = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`,{
                 headers: {
                     "Content-type": "application/json; charset=UTF-8",
-                    "Autho-rization": 'Bearer ' + process.env.PAYSTACK_TOKEN
+                    "Authorization": 'Bearer ' + this.secret_key
                 },
             })
-            // console.log(response.data)
             return response.data.data
         } catch (error) {
             throw error.response.data

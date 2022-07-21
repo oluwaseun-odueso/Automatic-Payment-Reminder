@@ -1,6 +1,6 @@
 const cron = require('node-cron');
-const SendEmail = require('../config/emailConfig')
-const Payment = require('./paystackPayment')
+const SendEmail = require('./emailConfig')
+const Payment = require('../utils/paystackPayment')
 
 async function startEndReminderCronJob (invoice, payment_link, reference) {
   const reminder_invoice_job = cron.schedule('*/20 * * * * *', async () => {
