@@ -57,7 +57,7 @@ router.post('/signUp', async(req, res) => {
         const {first_name, last_name, business_name, payment_link, email, phone_number, is_admin, password, confirm_password} = req.body
         try {
             if ( await checkEmailAndPhoneNumber (email, phone_number) ) {
-                res.status(400).send({ message : "Email and phone number already exists"}) 
+                res.status(400).send({ message : "Email and phone number already exist"}) 
                 return
             }
             if ( await checkEmail(email) ) {

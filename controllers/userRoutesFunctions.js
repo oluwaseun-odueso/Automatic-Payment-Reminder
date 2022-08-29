@@ -42,9 +42,6 @@ async function deleteAUser (id) {
     }
 }
 
-// deleteAUser(8)
-//     .then(res => console.log(res))
-
 async function checkEmail (email) {
     try {
         const emailCheck = await User.findOne({

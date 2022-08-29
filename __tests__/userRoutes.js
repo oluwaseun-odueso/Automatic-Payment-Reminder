@@ -125,7 +125,7 @@ describe('Sign up route test', () => {
         expect(response.statusCode).toBe(400);
     })
 
-    test("When email and phone_number already exists", async () => {
+    test("When email and phone_number already exist", async () => {
         const response = await request(app).post('/user/signUp').send({
             first_name: "Bola1",
             last_name: "Ade1",

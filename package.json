@@ -11,7 +11,7 @@
   "description": "Automated Payment Reminder",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "test": "jest"
   },
   "author": "",
