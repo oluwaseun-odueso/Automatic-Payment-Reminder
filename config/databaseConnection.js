@@ -2,8 +2,10 @@ const { Sequelize } = require('sequelize');
 require('dotenv').config()
 
 const sequelize = new Sequelize(process.env.PROD_SQ_DATABASE, process.env.PROD_SQ_USER, process.env.PROD_SQ_PASSWORD, {
-    host: process.env.PROD_SQ_HOST,
-    dialect: 'mysql'
+    dialect: 'mysql', 
+    dialectOptions: {
+      host: process.env.PROD_SQ_HOST
+    }
   });
 
 sequelize.authenticate()
