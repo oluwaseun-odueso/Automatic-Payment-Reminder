@@ -4,7 +4,8 @@ require('dotenv').config()
 const sequelize = new Sequelize(process.env.PROD_SQ_DATABASE, process.env.PROD_SQ_USER, process.env.PROD_SQ_PASSWORD, {
     dialect: 'mysql', 
     dialectOptions: {
-      host: process.env.PROD_SQ_HOST
+      host: process.env.PROD_SQ_HOST, 
+      multipleStatements: true
     }
   });
 
