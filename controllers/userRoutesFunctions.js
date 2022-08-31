@@ -120,9 +120,6 @@ async function getDetailsById (id) {
     }
 }
 
-// getDetailsByEmail("topeolaiya@gmail.com")
-//     .then(result => console.log(result))
-
 async function collectEmailHashedPassword (email) {
     try {
         const hashedPassword = await User.findOne({
@@ -154,9 +151,6 @@ async function updateAccountDetails (id, first_name, last_name, business_name, p
         return error 
     }
 }
-
-// updateAccountDetails(20, 'Oluwaseun', 'Janet', 'seunjane@gmail.com', '09073347721')
-//     .then(result => console.log(result))
 
 const functions = {
     createUser, 
