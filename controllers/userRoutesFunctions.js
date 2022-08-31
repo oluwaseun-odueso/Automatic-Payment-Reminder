@@ -117,9 +117,6 @@ async function getDetailsById (id) {
     }
 }
 
-// getDetailsByEmail("topeolaiya@gmail.com")
-//     .then(result => console.log(result))
-
 async function collectEmailHashedPassword (email) {
     try {
         const hashedPassword = await User.findOne({
